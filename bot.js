@@ -1,7 +1,7 @@
 const tmi = require('tmi.js');
 const https = require('https')
 
-
+FAN_PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw';
 // Define configuration options
 const opts = {
     identityOld: {
@@ -46,6 +46,27 @@ function spam(msg) {
     }
 }
 
+function getPlacementString(placement) {
+    switch (placement) {
+        case 1:
+            return '1st place POG';
+        case 2:
+            return '2th place VoHiYo ';
+        case 3:
+            return '3rd place TTours';
+        case 4:
+            return '4th place Kappa';
+        case 5:
+            return '5th place BibleThump BibleThump FeelsBadMan';
+        case 6:
+            return '6th place BibleThump BibleThump FeelsBadMan';
+        case 7:
+            return '7th place BibleThump BibleThump FeelsBadMan';
+        case 8:
+            return '8th place BibleThump BibleThump FeelsBadMan';
+    }
+
+}
 
 // Called every time a message comes in
 function onMessageHandler(target, context, msg, self) {
@@ -67,14 +88,30 @@ function onMessageHandler(target, context, msg, self) {
     } else if (commandName === '!history') {
         RECENT_GAMES = 'https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw/ids?count=20&api_key=RGAPI-93c48120-51e0-42d4-b3fb-8907c0a261e3';
         const req = https.get(RECENT_GAMES, res => {
-            res.on('data', d => {
-                d = JSON.parse(d);
+            const req2 = res.on('data', d => {
+                history = JSON.parse(d);
+                console.log(history);
                 const mostRecent = history[0];
-                RECENT_GAMES = 'https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw/ids?count=20&api_key=RGAPI-93c48120-51e0-42d4-b3fb-8907c0a261e3';
-                var summoner = ' === history ===';
-                summoner += d;
-                client.say(target, summoner);
-            })
+                console.log(mostRecent);
+                MATCH_DATA = `https://americas.api.riotgames.com/tft/match/v1/matches/${mostRecent}?api_key=RGAPI-93c48120-51e0-42d4-b3fb-8907c0a261e3`
+
+                https.get(MATCH_DATA, res2 => {
+                    let body = '';
+                    res2.on('data', function (chunk) {
+                        body += chunk; // string conversion
+                    }).on('end', function () {
+                        matchData = JSON.parse(body);
+                        info = matchData.info;
+                        participants = info.participants;
+                        fan = participants.find(p => p.puuid == FAN_PUUID);
+                        var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}.`;
+                        client.say(target, match);
+                    });
+                    res2.on('error', error => {
+                        console.error(error);
+                    })
+                });
+            });
         });
         req.end()
     } else if (commandName === '!MMR') {
