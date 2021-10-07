@@ -39,6 +39,8 @@ hashCode = s => s.split('').reduce((a, b) => {
 function spam(target, msg) {
     if (msg.toLowerCase().includes("squid")) {
         client.say(target, "GivePLZ GivePLZ GivePLZ GivePLZ GivePLZ");
+    } else if (msg.toLowerCase().includes("pepe")) {
+        client.say(target, `OSFrog OSFrog OSFrog OSFrog OSFrog`);
     } else if (msg.toLowerCase().includes("catjam")) {
         client.say(target, `${msg}? more like squidJAM Squid3 squidJAM`);
     } else if (msg.toLowerCase().includes("draconic")) {
@@ -53,7 +55,7 @@ function spam(target, msg) {
 function getPlacementString(placement) {
     switch (placement) {
         case 1:
-            return '1st place POG';
+            return '1st place PogChamp';
         case 2:
             return '2th place VoHiYo ';
         case 3:
@@ -70,6 +72,14 @@ function getPlacementString(placement) {
             return '8th place BibleThump BibleThump FeelsBadMan';
     }
 
+}
+
+function getDamageString(damage) {
+    if (damage > 100) {
+        return 'PogChamp PogChamp PogChamp';
+    } else {
+        return 'LUL LUL LUL';
+    }
 }
 
 // Called every time a message comes in
@@ -97,6 +107,7 @@ function onMessageHandler(target, context, msg, self) {
                 const mostRecent = history[0];
                 console.log(mostRecent);
                 MATCH_DATA = `https://americas.api.riotgames.com/tft/match/v1/matches/${mostRecent}?api_key=${API_KEY}`
+                console.log(MATCH_DATA);
 
                 https.get(MATCH_DATA, res2 => {
                     let body = '';
@@ -107,7 +118,10 @@ function onMessageHandler(target, context, msg, self) {
                         info = matchData.info;
                         participants = info.participants;
                         fan = participants.find(p => p.puuid == FAN_PUUID);
-                        var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}.`;
+                        var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}. `;
+
+                        total_damage = fan.total_damage_to_players;
+                        match += `He dealt ${total_damage} damage to players that game ${getDamageString(total_damage)}`;
                         client.say(target, match);
                     });
                     res2.on('error', error => {
@@ -117,16 +131,38 @@ function onMessageHandler(target, context, msg, self) {
             });
         });
         req.end()
+    } else if (commandName.includes('!scout')) {
+        console.log(commandName);
+        enemy = commandName.split('scout ')[1];
+        URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/${enemy}?api_key=${API_KEY}`;
+        console.log(URL);
+        const req = https.get(URL, res => {
+            res.on('data', d => {
+                d = JSON.parse(d);
+                console.log(d);
+                summonerID = d.id;
+                MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/${summonerID}?api_key=${API_KEY}`;
+                console.log(MMR_URL);
+                const req2 = https.get(MMR_URL, res2 => {
+                    res2.on('data', d => {
+                        d = JSON.parse(d.toString());
+                        console.log(d);
+                        fan = d[0];
+                        console.log(fan);
+                        summoner = `${fan.summonerName} is currently ${fan.tier} ${fan.rank} ${fan.leaguePoints} LP.\n\n`;
+                        winrate = Number((fan.wins / (fan.wins + fan.losses) * 100).toFixed(1));
+                        summoner += `This set he has gotten first ${fan.wins} out of ${fan.wins + fan.losses} games (${winrate}%). `;
+                        client.say(target, summoner);
+                    });
+                })
+            })
+        });
     } else if (commandName === '!MMR') {
         URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/fanathema?api_key=${API_KEY}`;
         MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/g5gaMJ2p2a6CrirWqjdF1dsnqKyh0Se_R5Gc8GWiGc_Npms?api_key=${API_KEY}`;
         const req = https.get(MMR_URL, res => {
-            console.log(`statusCode: ${res.statusCode}`)
             res.on('data', d => {
-                d = d.toString();
-                d = JSON.parse(d);
-                console.log(d);
-                console.log('----');
+                d = JSON.parse(d.toString());
                 fan = d[0];
                 summoner = `${fan.summonerName} is currently ${fan.tier} ${fan.rank} ${fan.leaguePoints} LP.\n\n`;
                 summoner += 'GivePLZ GivePLZ GivePLZ ';
