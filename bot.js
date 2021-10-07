@@ -1,3 +1,6 @@
+console.log('https://developer.riotgames.com/ to regenerate key');
+API_KEY = 'RGAPI-f6ce64c6-6104-4542-bf64-aa0c5d5ed606';
+
 const tmi = require('tmi.js');
 const https = require('https')
 
@@ -33,14 +36,15 @@ hashCode = s => s.split('').reduce((a, b) => {
 }, 0)
 
 
-function spam(msg) {
+function spam(target, msg) {
     if (msg.toLowerCase().includes("squid")) {
         client.say(target, "GivePLZ GivePLZ GivePLZ GivePLZ GivePLZ");
+    } else if (msg.toLowerCase().includes("catjam")) {
+        client.say(target, `${msg}? more like squidJAM Squid3 squidJAM`);
     } else if (msg.toLowerCase().includes("draconic")) {
-        client.say(target, "TheIlluminati TheIlluminati TheIlluminati TheIlluminati TheIlluminati");
+        client.say(target, "BagOfMemes BagOfMemes BagOfMemes BagOfMemes BagOfMemes ");
     } else {
-        if (hashCode(msg) % 10 > 7) {
-            // client.say(target, " No " + msg + " ... only squid Squid1 Squid2 Squid3 Squid4");
+        if (hashCode(msg) % 10 > 2) {
             client.say(target, "Squid1 Squid2 Squid3 Squid4");
         }
     }
@@ -74,8 +78,6 @@ function onMessageHandler(target, context, msg, self) {
         return;
     } // Ignore messages from the bot
 
-    // spam(msg);
-
     console.log(msg);
     // Remove whitespace from chat message
     const commandName = msg.trim();
@@ -86,14 +88,15 @@ function onMessageHandler(target, context, msg, self) {
         client.say(target, `You rolled a ${num}`);
         console.log(`* Executed ${commandName} command`);
     } else if (commandName === '!history') {
-        RECENT_GAMES = 'https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw/ids?count=20&api_key=RGAPI-93c48120-51e0-42d4-b3fb-8907c0a261e3';
+        RECENT_GAMES = `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw/ids?count=20&api_key=${API_KEY}`
+        console.log(RECENT_GAMES);
         const req = https.get(RECENT_GAMES, res => {
             const req2 = res.on('data', d => {
                 history = JSON.parse(d);
                 console.log(history);
                 const mostRecent = history[0];
                 console.log(mostRecent);
-                MATCH_DATA = `https://americas.api.riotgames.com/tft/match/v1/matches/${mostRecent}?api_key=RGAPI-93c48120-51e0-42d4-b3fb-8907c0a261e3`
+                MATCH_DATA = `https://americas.api.riotgames.com/tft/match/v1/matches/${mostRecent}?api_key=${API_KEY}`
 
                 https.get(MATCH_DATA, res2 => {
                     let body = '';
@@ -115,8 +118,8 @@ function onMessageHandler(target, context, msg, self) {
         });
         req.end()
     } else if (commandName === '!MMR') {
-        URL = 'https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/fanathema?api_key=RGAPI-93c48120-51e0-42d4-b3fb-8907c0a261e3'
-        MMR_URL = 'https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/g5gaMJ2p2a6CrirWqjdF1dsnqKyh0Se_R5Gc8GWiGc_Npms?api_key=RGAPI-93c48120-51e0-42d4-b3fb-8907c0a261e3'
+        URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/fanathema?api_key=${API_KEY}`;
+        MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/g5gaMJ2p2a6CrirWqjdF1dsnqKyh0Se_R5Gc8GWiGc_Npms?api_key=${API_KEY}`;
         const req = https.get(MMR_URL, res => {
             console.log(`statusCode: ${res.statusCode}`)
             res.on('data', d => {
@@ -138,6 +141,8 @@ function onMessageHandler(target, context, msg, self) {
             console.error(error)
         })
         req.end()
+    } else {
+        spam(target, msg);
     }
 }
 
@@ -153,7 +158,7 @@ function onConnectedHandler(addr, port) {
 }
 
 
-riot = 'RGAPI-93c48120-51e0-42d4-b3fb-8907c0a261e3'
+riot = '${API_KEY}'
 
 temp = {
     "id": "g5gaMJ2p2a6CrirWqjdF1dsnqKyh0Se_R5Gc8GWiGc_Npms",
