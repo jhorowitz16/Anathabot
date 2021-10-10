@@ -46,6 +46,8 @@ function spam(target, msg) {
     } else if (msg.toLowerCase().includes("all his viewers are me")) {
         client.say(target, "I like that twitch.tv/anathana doesn't realize that all his viewers are me on different " +
             "accounts. Dont believe me? watch me post this on my other accounts");
+    } else if (msg.toLowerCase().includes("slither")) {
+        client.say(target, "ResidentSleeper ResidentSleeper ResidentSleeper ResidentSleeper ResidentSleeper");
     } else if (msg.toLowerCase().includes("draconic")) {
         client.say(target, "SMOrc SMOrc SMOrc SMOrc SMOrc");
     } else {
