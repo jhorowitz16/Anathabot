@@ -1,5 +1,5 @@
 console.log('https://developer.riotgames.com/ to regenerate key');
-API_KEY = 'RGAPI-f6ce64c6-6104-4542-bf64-aa0c5d5ed606';
+API_KEY = 'RGAPI-8e3e0845-23bd-42c7-b3dc-8c40b5756f59';
 
 const tmi = require('tmi.js');
 const https = require('https')
@@ -43,8 +43,11 @@ function spam(target, msg) {
         client.say(target, `OSFrog OSFrog OSFrog OSFrog OSFrog`);
     } else if (msg.toLowerCase().includes("catjam")) {
         client.say(target, `${msg}? more like squidJAM Squid3 squidJAM`);
+    } else if (msg.toLowerCase().includes("all his viewers are me")) {
+        client.say(target, "I like that twitch.tv/anathana doesn't realize that all his viewers are me on different " +
+            "accounts. Dont believe me? watch me post this on my other accounts");
     } else if (msg.toLowerCase().includes("draconic")) {
-        client.say(target, "BagOfMemes BagOfMemes BagOfMemes BagOfMemes BagOfMemes ");
+        client.say(target, "SMOrc SMOrc SMOrc SMOrc SMOrc");
     } else {
         if (hashCode(msg) % 10 > 2) {
             client.say(target, "Squid1 Squid2 Squid3 Squid4");
@@ -138,6 +141,8 @@ function onMessageHandler(target, context, msg, self) {
     } else if (commandName.includes('!scout')) {
         console.log(commandName);
         enemy = commandName.split('scout ')[1];
+        console.log(enemy);
+        enemy = enemy.replace(' ', '%20');
         URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/${enemy}?api_key=${API_KEY}`;
         console.log(URL);
         const req = https.get(URL, res => {
