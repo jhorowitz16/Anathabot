@@ -68,13 +68,13 @@ function getPlacementString(placement) {
         case 4:
             return '4th place Kappa';
         case 5:
-            return '5th place NotLikeThis';
+            return '5th place MrDestructoid';
         case 6:
             return '6th place NotLikeThis';
         case 7:
             return '7th place BibleThump BibleThump . _ .';
         case 8:
-            return '8th place BibleThump BibleThump . __ .';
+            return '8th place BibleThump BibleThump BibleThump BibleThump . __ .';
     }
 
 }
@@ -91,47 +91,39 @@ function getDamageString(damage) {
     }
 }
 
+function getHistoryMessage(matchData) {
+    const fan = matchData.info.participants.find(p => p.puuid == FAN_PUUID);
+    var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}. `;
+    match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}`;
+    return match;
+}
+
+RECENT_GAMES = `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw/ids?count=20&api_key=${API_KEY}`
+
 // Called every time a message comes in
 function onMessageHandler(target, context, msg, self) {
     if (self) {
         return;
     } // Ignore messages from the bot
 
-    console.log(msg);
-    // Remove whitespace from chat message
     const commandName = msg.trim();
 
-    // If the command is known, let's execute it
     if (commandName === '!dice') {
-        const num = rollDice();
-        client.say(target, `You rolled a ${num}`);
-        console.log(`* Executed ${commandName} command`);
+        client.say(target, `You rolled a ${rollDice()}`);
     } else if (commandName === '!history') {
-        RECENT_GAMES = `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw/ids?count=20&api_key=${API_KEY}`
-        console.log(RECENT_GAMES);
         const req = https.get(RECENT_GAMES, res => {
             const req2 = res.on('data', d => {
                 history = JSON.parse(d);
-                console.log(history);
                 const mostRecent = history[0];
-                console.log(mostRecent);
                 MATCH_DATA = `https://americas.api.riotgames.com/tft/match/v1/matches/${mostRecent}?api_key=${API_KEY}`
-                console.log(MATCH_DATA);
-
                 https.get(MATCH_DATA, res2 => {
                     let body = '';
                     res2.on('data', function (chunk) {
                         body += chunk; // string conversion
                     }).on('end', function () {
                         matchData = JSON.parse(body);
-                        info = matchData.info;
-                        participants = info.participants;
-                        fan = participants.find(p => p.puuid == FAN_PUUID);
-                        var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}. `;
-
-                        total_damage = fan.total_damage_to_players;
-                        match += `He dealt ${total_damage} damage to players that game ${getDamageString(total_damage)}`;
-                        client.say(target, match);
+                        // console.log(JSON.stringify(matchData, null, 4)); // print the response
+                        client.say(target, getHistoryMessage(matchData));
                     });
                     res2.on('error', error => {
                         console.error(error);
@@ -141,12 +133,8 @@ function onMessageHandler(target, context, msg, self) {
         });
         req.end()
     } else if (commandName.includes('!scout')) {
-        console.log(commandName);
-        enemy = commandName.split('scout ')[1];
-        console.log(enemy);
-        enemy = enemy.replace(' ', '%20');
+        enemy = commandName.split('scout ')[1].replace(' ', '%20');
         URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/${enemy}?api_key=${API_KEY}`;
-        console.log(URL);
         const req = https.get(URL, res => {
             res.on('data', d => {
                 summonerID = JSON.parse(d).id;
@@ -155,11 +143,9 @@ function onMessageHandler(target, context, msg, self) {
                     return
                 }
                 MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/${summonerID}?api_key=${API_KEY}`;
-                console.log(MMR_URL);
                 const req2 = https.get(MMR_URL, res2 => {
                     res2.on('data', d => {
                         fan = JSON.parse(d.toString())[0];
-                        console.log(fan);
                         if (!fan || !fan.summonerName) {
                             client.say(target, bugString());
                             return
@@ -187,7 +173,7 @@ function onMessageHandler(target, context, msg, self) {
                 winrate = Number((fan.wins / (fan.wins + fan.losses) * 100).toFixed(1));
                 summoner += `This set he has gotten first ${fan.wins} out of ${fan.wins + fan.losses} games (${winrate}%). `;
                 summoner += 'GivePLZ GivePLZ GivePLZ ';
-                summoner += 'Follow him at https://lolchess.gg/profile/na/fanathema';
+                summoner += 'Follow his climb at https://lolchess.gg/profile/na/fanathema :D';
                 client.say(target, summoner);
             })
         })
@@ -210,3 +196,5 @@ function rollDice() {
 function onConnectedHandler(addr, port) {
     console.log(`* Connected to ${addr}:${port}`);
 }
+
+module.exports = {rollDice, getHistoryMessage}
