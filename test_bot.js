@@ -21,3 +21,15 @@ describe('History', function () {
         });
     });
 });
+
+describe('Ladder', function () {
+    describe('#getLadderMessage()', function () {
+        it('should return the correct ladder message for fanathema', function () {
+            message = bot.getLadderMessage(fixtures.MASTER_LADDER_FIXTURE);
+            assert.equal(
+                message,
+                'false test',
+            );
+        });
+    });
+});
