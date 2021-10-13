@@ -28,7 +28,7 @@ describe('Ladder', function () {
             message = bot.getLadderMessage(fixtures.MASTER_LADDER_FIXTURE);
             assert.equal(
                 message,
-                'false test',
+                'twitch.tv/anathana is in the top 98.8% of TFT Masters Players (NA).',
             );
         });
     });

@@ -1,5 +1,5 @@
 console.log('https://developer.riotgames.com/ to regenerate key');
-API_KEY = 'RGAPI-8e3e0845-23bd-42c7-b3dc-8c40b5756f59';
+API_KEY = 'RGAPI-15c268ea-0ae8-420b-a62e-8f525f5e7a9b';
 
 const tmi = require('tmi.js');
 const https = require('https')
@@ -99,18 +99,26 @@ function getHistoryMessage(matchData) {
 }
 
 function getLadderMessage(ladderData) {
-    const sorted = ladderData.entries.sort(p => p.leaguePoints);
-    total = sorted.length;
-    console.log(sorted[0]);
-    console.log(sorted[100]);
-    console.log(sorted[10000]);
-    const fan = sorted.findIndex(p => p.summonerName == 'fanathema');
-    console.log('index');
-    console.log(total);
-    console.log(fan);
 
-
-    return `${false} test`;
+    let arr = [];
+    console.log(ladderData.entries[0]);
+    console.log(ladderData.entries[0].leaguePoints);
+    ladderData.entries.forEach(x => {
+        arr.push([Number(parseInt(x.leaguePoints)), x.summonerName]);
+    });
+    arr.sort();
+    console.log(arr.length);
+    console.log(arr[10000]);
+    console.log(arr.toString());
+    let fan = arr.findIndex(p => p[1] == 'fanathema');
+    console.log(`original ${fan}`);
+    console.log(fan.leaguePoints);
+    const fanLP = parseInt(fan.leaguePoints);
+    console.log(Number.isInteger(fanLP));
+    console.log(Number.isInteger(4));
+    LPs = arr.map(tup => tup[0]);
+    percentile = Number((100 - (fan / arr.length * 100)).toFixed(3));
+    return `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT Masters Players (NA) at ${arr[fan][0]} LP.`;
 }
 
 RECENT_GAMES = `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw/ids?count=20&api_key=${API_KEY}`
@@ -122,10 +130,9 @@ function onMessageHandler(target, context, msg, self) {
     } // Ignore messages from the bot
 
     const commandName = msg.trim();
+    console.log(commandName);
 
     try {
-
-
         if (commandName === '!dice') {
             client.say(target, `You rolled a ${rollDice()}`);
         } else if (commandName === '!history') {
@@ -193,12 +200,26 @@ function onMessageHandler(target, context, msg, self) {
                     summoner += 'GivePLZ GivePLZ GivePLZ ';
                     summoner += 'Follow his climb at https://lolchess.gg/profile/na/fanathema :D';
                     client.say(target, summoner);
-                })
+                });
             })
             req.on('error', error => {
                 console.error(error)
             })
             req.end()
+        } else if (commandName === '!ladder') {
+            LADDER_URL = `https://na1.api.riotgames.com/tft/league/v1/master?api_key=${API_KEY}`;
+            https.get(LADDER_URL, res2 => {
+                let body = '';
+                res2.on('data', function (chunk) {
+                    body += chunk; // string conversion
+                }).on('end', function () {
+                    const ladderData = JSON.parse(body);
+                    client.say(target, getLadderMessage(ladderData));
+                });
+                res2.on('error', error => {
+                    console.error(error);
+                })
+            });
         } else {
             spam(target, msg);
         }
