@@ -32,7 +32,8 @@ hashCode = s => s.split('').reduce((a, b) => {
 const seenUsers = new Set();
 
 function onMessageHandler(target, context, msg, self) {
-    if (self) {
+    console.log(self);
+    if (self || context['display-name'] === 'MikeYeungP1' || context['display-name'] === 'anathaBot') {
         return;
     } // Ignore messages from the bot
 

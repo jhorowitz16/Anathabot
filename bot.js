@@ -1,10 +1,31 @@
 console.log('https://developer.riotgames.com/ to regenerate key');
-API_KEY = 'RGAPI-15c268ea-0ae8-420b-a62e-8f525f5e7a9b';
-
 const tmi = require('tmi.js');
-const https = require('https')
+const fs = require('fs');
+const https = require('https');
 
-FAN_PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw';
+
+let isRiotAvailable = false;
+PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw';
+try {
+    API_KEY = fs.readFileSync('key.txt', 'utf8');
+    console.log(API_KEY);
+    URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/anathana?api_key=${API_KEY}`;
+    console.log(URL);
+    https.get(URL, res => {
+        res.on('data', d => {
+            ladder = JSON.parse(d);
+            console.log(ladder);
+            isRiotAvailable = (!!ladder.id);
+        });
+        res.on('error', error => {
+            isRiotAvailable = false;
+        });
+
+    });
+} catch (err) {
+    console.error(err)
+}
+
 // Define configuration options
 const opts = {
     identityOld: {
@@ -80,6 +101,9 @@ function getPlacementString(placement) {
 }
 
 function bugString() {
+    console.log(isRiotAvailable);
+    if (!isRiotAvailable)
+        return 'Spam HolidayTree this HolidayTree tree HolidayTree cuz HolidayTree invalid HolidayTree API HolidayTree key';
     return "Spam BrainSlug this BrainSlug slug BrainSlug cuz BrainSlug there's BrainSlug a BrainSlug bug";
 }
 
@@ -92,40 +116,70 @@ function getDamageString(damage) {
 }
 
 function getHistoryMessage(matchData) {
-    const fan = matchData.info.participants.find(p => p.puuid == FAN_PUUID);
+    if (!matchData.info)
+        return bugString();
+    matchData.info.participants.forEach(p => {
+        console.log(p.puuid);
+        console.log(p.puuid === PUUID);
+    });
+    console.log(matchData.info.participants[0]);
+    const fan = matchData.info.participants.find(p => p.puuid === PUUID);
+    if (!fan)
+        return bugString();
+    console.log(fan);
+    let comp = '';
+    let carries = '';
+    fan.units.forEach(unit => {
+        console.log(unit.character_id);
+        name = unit.character_id.split('TFT5_')[1];
+        comp += name + ' ';
+        if (unit.items.length === 3)
+            carries += name + ' ';
+    });
+    console.log(comp);
     var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}. `;
-    match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}`;
+    match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}. `;
+    match += `He put 3 items on * ${carries}* with a final comp of ${comp}.`;
     return match;
 }
 
-function getLadderMessage(ladderData) {
-
+function getLadderMessage(ladderData, ladder) {
     let arr = [];
-    console.log(ladderData.entries[0]);
-    console.log(ladderData.entries[0].leaguePoints);
     ladderData.entries.forEach(x => {
         arr.push([Number(parseInt(x.leaguePoints)), x.summonerName]);
     });
     arr.sort();
-    console.log(arr.length);
-    console.log(arr[10000]);
-    console.log(arr.toString());
-    let fan = arr.findIndex(p => p[1] == 'fanathema');
-    console.log(`original ${fan}`);
-    console.log(fan.leaguePoints);
+    let fan = arr.findIndex(p => p[1] == 'anathana');
+    ladderStr = ladder.charAt(0).toUpperCase() + ladder.slice(1);
+    if (fan < 0)
+        return `:( looks like twitch.tv/anathana isn't in the TFT ${ladderStr} (NA) ladder`;
     const fanLP = parseInt(fan.leaguePoints);
-    console.log(Number.isInteger(fanLP));
-    console.log(Number.isInteger(4));
     LPs = arr.map(tup => tup[0]);
     percentile = Number((100 - (fan / arr.length * 100)).toFixed(3));
-    return `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT Masters Players (NA) at ${arr[fan][0]} LP.`;
+    if (fan < arr.length) {
+        console.log(arr[fan]);
+        return `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT ${ladderStr} Players (NA) at ${arr[fan][0]} LP.`;
+    } else {
+        bugString();
+    }
 }
 
-RECENT_GAMES = `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw/ids?count=20&api_key=${API_KEY}`
+
+RECENT_GAMES = `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/${PUUID}/ids?count=20&api_key=${API_KEY}`
+
+function checkRiotAvailable(client, target) {
+    console.log(`available ${isRiotAvailable}`);
+    if (isRiotAvailable)
+        return;
+    client.say(
+        target,
+        'Spam HolidayTree this HolidayTree tree HolidayTree cuz HolidayTree invalid HolidayTree API HolidayTree key'
+    );
+}
 
 // Called every time a message comes in
 function onMessageHandler(target, context, msg, self) {
-    if (self) {
+    if (self || context['display-name'] === 'anathaBot') {
         return;
     } // Ignore messages from the bot
 
@@ -136,10 +190,12 @@ function onMessageHandler(target, context, msg, self) {
         if (commandName === '!dice') {
             client.say(target, `You rolled a ${rollDice()}`);
         } else if (commandName === '!history') {
+            checkRiotAvailable(client, target);
             const req = https.get(RECENT_GAMES, res => {
                 const req2 = res.on('data', d => {
                     history = JSON.parse(d);
                     const mostRecent = history[0];
+                    console.log(mostRecent);
                     MATCH_DATA = `https://americas.api.riotgames.com/tft/match/v1/matches/${mostRecent}?api_key=${API_KEY}`
                     https.get(MATCH_DATA, res2 => {
                         let body = '';
@@ -147,7 +203,7 @@ function onMessageHandler(target, context, msg, self) {
                             body += chunk; // string conversion
                         }).on('end', function () {
                             matchData = JSON.parse(body);
-                            // console.log(JSON.stringify(matchData, null, 4)); // print the response
+                            console.log(matchData);
                             client.say(target, getHistoryMessage(matchData));
                         });
                         res2.on('error', error => {
@@ -158,6 +214,7 @@ function onMessageHandler(target, context, msg, self) {
             });
             req.end()
         } else if (commandName.includes('!scout')) {
+            checkRiotAvailable(client, target);
             enemy = commandName.split('scout ')[1].replace(' ', '%20');
             URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/${enemy}?api_key=${API_KEY}`;
             const req = https.get(URL, res => {
@@ -184,7 +241,8 @@ function onMessageHandler(target, context, msg, self) {
                 })
             });
         } else if (commandName === '!MMR') {
-            URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/fanathema?api_key=${API_KEY}`;
+            checkRiotAvailable(client, target);
+            URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/anathana?api_key=${API_KEY}`;
             MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/g5gaMJ2p2a6CrirWqjdF1dsnqKyh0Se_R5Gc8GWiGc_Npms?api_key=${API_KEY}`;
             const req = https.get(MMR_URL, res => {
                 res.on('data', d => {
@@ -198,7 +256,7 @@ function onMessageHandler(target, context, msg, self) {
                     winrate = Number((fan.wins / (fan.wins + fan.losses) * 100).toFixed(1));
                     summoner += `This set he has gotten first ${fan.wins} out of ${fan.wins + fan.losses} games (${winrate}%). `;
                     summoner += 'GivePLZ GivePLZ GivePLZ ';
-                    summoner += 'Follow his climb at https://lolchess.gg/profile/na/fanathema :D';
+                    summoner += 'Follow his climb at https://lolchess.gg/profile/na/anathana :D';
                     client.say(target, summoner);
                 });
             })
@@ -207,14 +265,18 @@ function onMessageHandler(target, context, msg, self) {
             })
             req.end()
         } else if (commandName === '!ladder') {
-            LADDER_URL = `https://na1.api.riotgames.com/tft/league/v1/master?api_key=${API_KEY}`;
+            checkRiotAvailable(client, target);
+            let ladder = 'grandmaster';
+            let LADDER_URL = `https://na1.api.riotgames.com/tft/league/v1/${ladder}?api_key=${API_KEY}`;
+            console.log(LADDER_URL);
             https.get(LADDER_URL, res2 => {
                 let body = '';
                 res2.on('data', function (chunk) {
                     body += chunk; // string conversion
                 }).on('end', function () {
                     const ladderData = JSON.parse(body);
-                    client.say(target, getLadderMessage(ladderData));
+                    console.log(ladderData);
+                    client.say(target, getLadderMessage(ladderData, ladder));
                 });
                 res2.on('error', error => {
                     console.error(error);
