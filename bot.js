@@ -93,9 +93,9 @@ function getPlacementString(placement) {
         case 6:
             return '6th place NotLikeThis';
         case 7:
-            return '7th place BibleThump BibleThump . _ .';
+            return '7th place BibleThump BibleThump';
         case 8:
-            return '8th place BibleThump BibleThump BibleThump BibleThump . __ .';
+            return '8th place BibleThump BibleThump BibleThump BibleThump';
     }
 
 }
@@ -158,7 +158,9 @@ function getLadderMessage(ladderData, ladder) {
     percentile = Number((100 - (fan / arr.length * 100)).toFixed(3));
     if (fan < arr.length) {
         console.log(arr[fan]);
-        return `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT ${ladderStr} Players (NA) at ${arr[fan][0]} LP.`;
+        const report = `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT ${ladderStr} Players (NA) at ${arr[fan][0]} LP.`;
+        return `${report} He's currently GivePLZ Rank #${750 - fan} GivePLZ.`
+
     } else {
         bugString();
     }
@@ -219,17 +221,21 @@ function onMessageHandler(target, context, msg, self) {
             URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/${enemy}?api_key=${API_KEY}`;
             const req = https.get(URL, res => {
                 res.on('data', d => {
+                    console.log('here');
                     summonerID = JSON.parse(d).id;
                     if (!summonerID) {
+                        console.log('no summoner id');
                         client.say(target, bugString());
                         return
                     }
                     MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/${summonerID}?api_key=${API_KEY}`;
                     const req2 = https.get(MMR_URL, res2 => {
                         res2.on('data', d => {
+                            console.log('there');
                             fan = JSON.parse(d.toString())[0];
+                            console.log(fan);
                             if (!fan || !fan.summonerName) {
-                                client.say(target, bugString());
+                                client.say(target, `BibleThump ${commandName.split('scout ')[1]} hasn't played any ranked games this set FeelsBadMan BibleThump`);
                                 return
                             }
                             summoner = `${fan.summonerName} is currently ${fan.tier} ${fan.rank} ${fan.leaguePoints} LP.\n\n`;
@@ -264,6 +270,10 @@ function onMessageHandler(target, context, msg, self) {
                 console.error(error)
             })
             req.end()
+        } else if (commandName === '!help') {
+            BOTS = 'MrDestructoid MrDestructoid MrDestructoid';
+            const msg = `${BOTS} Possible Commands: !help, !history, !scout SUMMONERNAME, and !MMR. Any questions lmk in chat ty ${BOTS}`;
+            client.say(target, msg);
         } else if (commandName === '!ladder') {
             checkRiotAvailable(client, target);
             let ladder = 'grandmaster';
