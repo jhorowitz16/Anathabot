@@ -246,7 +246,7 @@ function onMessageHandler(target, context, msg, self) {
                     })
                 })
             });
-        } else if (commandName === '!MMR') {
+        } else if (commandName.includes('!MMR')) {
             checkRiotAvailable(client, target);
             URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/anathana?api_key=${API_KEY}`;
             MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/g5gaMJ2p2a6CrirWqjdF1dsnqKyh0Se_R5Gc8GWiGc_Npms?api_key=${API_KEY}`;
