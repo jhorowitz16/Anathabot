@@ -6,6 +6,10 @@ const https = require('https');
 
 let isRiotAvailable = false;
 PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw';
+items = fs.readFileSync('items.json', 'utf8');
+ITEMS = JSON.parse(items);
+
+
 try {
     API_KEY = fs.readFileSync('key.txt', 'utf8');
     console.log(API_KEY);
@@ -118,28 +122,27 @@ function getDamageString(damage) {
 function getHistoryMessage(matchData) {
     if (!matchData.info)
         return bugString();
-    matchData.info.participants.forEach(p => {
-        console.log(p.puuid);
-        console.log(p.puuid === PUUID);
-    });
-    console.log(matchData.info.participants[0]);
     const fan = matchData.info.participants.find(p => p.puuid === PUUID);
     if (!fan)
         return bugString();
     console.log(fan);
     let comp = '';
     let carries = '';
+    let itemStr = '';
     fan.units.forEach(unit => {
         console.log(unit.character_id);
         name = unit.character_id.split('TFT5_')[1];
-        comp += name + ' ';
-        if (unit.items.length === 3)
+        tier = unit.tier
+        comp += name + '_' + tier + ' ';
+        if (unit.items.length === 3) {
             carries += name + ' ';
+            itemStr = ` (${unit.items.map(id => ITEMS.find(x => x.id === id).name)})`;
+        }
     });
     console.log(comp);
     var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}. `;
     match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}. `;
-    match += `He put 3 items on * ${carries}* with a final comp of ${comp}.`;
+    match += `He put 3 items on * ${carries}*${itemStr} with a final comp of ${comp}.`;
     return match;
 }
 
@@ -191,6 +194,7 @@ function onMessageHandler(target, context, msg, self) {
     try {
         if (commandName === '!dice') {
             client.say(target, `You rolled a ${rollDice()}`);
+        } else if (commandName === '!lobby') {
         } else if (commandName === '!history') {
             checkRiotAvailable(client, target);
             const req = https.get(RECENT_GAMES, res => {
@@ -272,7 +276,7 @@ function onMessageHandler(target, context, msg, self) {
             req.end()
         } else if (commandName === '!help') {
             BOTS = 'MrDestructoid MrDestructoid MrDestructoid';
-            const msg = `${BOTS} Possible Commands: !help, !history, !scout SUMMONERNAME, and !MMR. Any questions lmk in chat ty ${BOTS}`;
+            const msg = `${BOTS} Possible Commands: !help, !history, !ladder, !scout SUMMONERNAME, and !MMR. Any questions lmk in chat ty ${BOTS}`;
             client.say(target, msg);
         } else if (commandName === '!ladder') {
             checkRiotAvailable(client, target);
