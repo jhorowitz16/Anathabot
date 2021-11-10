@@ -131,7 +131,7 @@ function getHistoryMessage(matchData) {
     let itemStr = '';
     fan.units.forEach(unit => {
         console.log(unit.character_id);
-        name = unit.character_id.split('TFT5_')[1];
+        name = unit.character_id.split('TFT6_')[1];
         tier = unit.tier
         comp += name + '_' + tier + ' ';
         if (unit.items.length === 3) {
@@ -142,6 +142,8 @@ function getHistoryMessage(matchData) {
     console.log(comp);
     var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}. `;
     match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}. `;
+    if (carries.includes('Malz'))
+        match += 'He ran TwitchLit MALZ REROLL TwitchLit. ';
     match += `He put 3 items on * ${carries}*${itemStr} with a final comp of ${comp}.`;
     return match;
 }

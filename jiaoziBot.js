@@ -6,8 +6,8 @@ const https = require('https')
 // Define configuration options
 const opts = {
     identity: {
-        username: 'MikeYeungP1',
-        password: 'oauth:sasi6bglezj08dzivyqtca7hg00jwp'
+        username: 'jiaoziBot',
+        password: 'oauth:m3ur3o0jou3km2rxiq3qg49ub3vmnw'
     },
     channels: [
         'anathana',
@@ -33,7 +33,7 @@ const seenUsers = new Set();
 
 function onMessageHandler(target, context, msg, self) {
     console.log(self);
-    if (self || context['display-name'] === 'MikeYeungP1' || context['display-name'] === 'anathaBot' || context['display-name'] === 'anathana') {
+    if (self || context['display-name'] === 'baozijiaozi') {
         return;
     } // Ignore messages from the bot
 
@@ -56,3 +56,5 @@ function onMessageHandler(target, context, msg, self) {
 function onConnectedHandler(addr, port) {
     console.log(`* Connected to ${addr}:${port}`);
 }
+
+
