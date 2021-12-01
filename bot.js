@@ -2,6 +2,7 @@ console.log('https://developer.riotgames.com/ to regenerate key');
 const tmi = require('tmi.js');
 const fs = require('fs');
 const https = require('https');
+const request = require('request-promise');
 
 
 let isRiotAvailable = false;
@@ -29,6 +30,25 @@ try {
 } catch (err) {
     console.error(err)
 }
+
+// fetch the ladder sizes
+let LADDER_LENGTHS = [0, 0, 0];
+const ladders = ['master', 'grandmaster', 'challenger'];
+const urls = ladders.map(lad => `https://na1.api.riotgames.com/tft/league/v1/${lad}?api_key=${API_KEY}`);
+console.log(urls);
+const promises = urls.map(url => request(url));
+Promise.all(promises).then((data) => {
+    LADDER_LENGTHS = data.map(ladderData => {
+        const json = JSON.parse(ladderData);
+        if (!json) {
+            console.log('ladder error');
+            return;
+        }
+        console.log(json.entries.length);
+        return json.entries.length;
+    })
+});
+
 
 // Define configuration options
 const opts = {
@@ -136,7 +156,13 @@ function getHistoryMessage(matchData) {
         comp += name + '_' + tier + ' ';
         if (unit.items.length === 3) {
             carries += name + ' ';
-            itemStr = ` (${unit.items.map(id => ITEMS.find(x => x.id === id).name)})`;
+
+            function getName(id) {
+                const item = ITEMS.find(x => x.id === id);
+                return !item ? '' : item.name;
+            }
+
+            itemStr = ` (${unit.items.map(getName)})`;
         }
     });
     console.log(comp);
@@ -144,6 +170,8 @@ function getHistoryMessage(matchData) {
     match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}. `;
     if (carries.includes('Malz'))
         match += 'He ran TwitchLit MALZ REROLL TwitchLit. ';
+    if (carries.includes('Yone'))
+        match += 'He ran TwitchLit CHALLENGER YONE TwitchLit. ';
     match += `He put 3 items on * ${carries}*${itemStr} with a final comp of ${comp}.`;
     return match;
 }
@@ -151,20 +179,26 @@ function getHistoryMessage(matchData) {
 function getLadderMessage(ladderData, ladder) {
     let arr = [];
     ladderData.entries.forEach(x => {
-        arr.push([Number(parseInt(x.leaguePoints)), x.summonerName]);
+        arr.push([parseInt(x.leaguePoints), x.summonerName]);
     });
-    arr.sort();
+    arr.sort(function(a, b) {
+      return a[0] - b[0];
+    });
+    console.log(arr.map(x => x[0]).toString());
+    // fan is the number of players in this ladder below anathana
     let fan = arr.findIndex(p => p[1] == 'anathana');
     ladderStr = ladder.charAt(0).toUpperCase() + ladder.slice(1);
     if (fan < 0)
         return `:( looks like twitch.tv/anathana isn't in the TFT ${ladderStr} (NA) ladder`;
     const fanLP = parseInt(fan.leaguePoints);
     LPs = arr.map(tup => tup[0]);
-    percentile = Number((100 - (fan / arr.length * 100)).toFixed(3));
+    percentile = Number((100 - (fan / arr.length * 100)).toFixed(2));
     if (fan < arr.length) {
-        console.log(arr[fan]);
-        const report = `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT ${ladderStr} Players (NA) at ${arr[fan][0]} LP.`;
-        return `${report} He's currently GivePLZ Rank #${750 - fan} GivePLZ.`
+        let report = `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT ${ladderStr} Players (NA) at ${arr[fan][0]} LP. `;
+        report += `there are ${LADDER_LENGTHS[2]} challenger players and ${LADDER_LENGTHS[1]} GMs above him. `;
+        const base = LADDER_LENGTHS[2] + LADDER_LENGTHS[0] - fan;
+        const rank = (ladder === 'master') ? base + LADDER_LENGTHS[1] : base;
+        return `${report} He's currently GivePLZ Rank #${rank} GivePLZ.`
 
     } else {
         bugString();
@@ -282,7 +316,7 @@ function onMessageHandler(target, context, msg, self) {
             client.say(target, msg);
         } else if (commandName === '!ladder') {
             checkRiotAvailable(client, target);
-            let ladder = 'grandmaster';
+            ladder = 'master';
             let LADDER_URL = `https://na1.api.riotgames.com/tft/league/v1/${ladder}?api_key=${API_KEY}`;
             console.log(LADDER_URL);
             https.get(LADDER_URL, res2 => {
@@ -291,7 +325,7 @@ function onMessageHandler(target, context, msg, self) {
                     body += chunk; // string conversion
                 }).on('end', function () {
                     const ladderData = JSON.parse(body);
-                    console.log(ladderData);
+                    console.log(ladderData.entries.length);
                     client.say(target, getLadderMessage(ladderData, ladder));
                 });
                 res2.on('error', error => {
