@@ -145,12 +145,10 @@ function getHistoryMessage(matchData) {
     const fan = matchData.info.participants.find(p => p.puuid === PUUID);
     if (!fan)
         return bugString();
-    console.log(fan);
     let comp = '';
     let carries = '';
     let itemStr = '';
     fan.units.forEach(unit => {
-        console.log(unit.character_id);
         name = unit.character_id.split('TFT6_')[1];
         tier = unit.tier
         comp += name + '_' + tier + ' ';
@@ -165,7 +163,6 @@ function getHistoryMessage(matchData) {
             itemStr = ` (${unit.items.map(getName)})`;
         }
     });
-    console.log(comp);
     var match = `Last Game twitch.tv/anathana placed ${getPlacementString(fan.placement)}. `;
     match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}. `;
     if (carries.includes('Malz'))
@@ -181,10 +178,9 @@ function getLadderMessage(ladderData, ladder) {
     ladderData.entries.forEach(x => {
         arr.push([parseInt(x.leaguePoints), x.summonerName]);
     });
-    arr.sort(function(a, b) {
-      return a[0] - b[0];
+    arr.sort(function (a, b) {
+        return a[0] - b[0];
     });
-    console.log(arr.map(x => x[0]).toString());
     // fan is the number of players in this ladder below anathana
     let fan = arr.findIndex(p => p[1] == 'anathana');
     ladderStr = ladder.charAt(0).toUpperCase() + ladder.slice(1);
@@ -195,10 +191,12 @@ function getLadderMessage(ladderData, ladder) {
     percentile = Number((100 - (fan / arr.length * 100)).toFixed(2));
     if (fan < arr.length) {
         let report = `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT ${ladderStr} Players (NA) at ${arr[fan][0]} LP. `;
-        report += `there are ${LADDER_LENGTHS[2]} challenger players and ${LADDER_LENGTHS[1]} GMs above him. `;
-        const base = LADDER_LENGTHS[2] + LADDER_LENGTHS[0] - fan;
-        const rank = (ladder === 'master') ? base + LADDER_LENGTHS[1] : base;
-        return `${report} He's currently GivePLZ Rank #${rank} GivePLZ.`
+        report += `there are ${LADDER_LENGTHS[2]} challenger players`;
+        if (ladder === 'master')
+            report += `and ${LADDER_LENGTHS[1]} GMs `;
+        const base = LADDER_LENGTHS[2] + LADDER_LENGTHS[1] - fan;
+        const rank = (ladder === 'master') ? base + LADDER_LENGTHS[0] : base;
+        return `${report} above him. He's currently GivePLZ Rank #${rank} GivePLZ.`
 
     } else {
         bugString();
@@ -237,7 +235,6 @@ function onMessageHandler(target, context, msg, self) {
                 const req2 = res.on('data', d => {
                     history = JSON.parse(d);
                     const mostRecent = history[0];
-                    console.log(mostRecent);
                     MATCH_DATA = `https://americas.api.riotgames.com/tft/match/v1/matches/${mostRecent}?api_key=${API_KEY}`
                     https.get(MATCH_DATA, res2 => {
                         let body = '';
@@ -273,7 +270,6 @@ function onMessageHandler(target, context, msg, self) {
                         res2.on('data', d => {
                             console.log('there');
                             fan = JSON.parse(d.toString())[0];
-                            console.log(fan);
                             if (!fan || !fan.summonerName) {
                                 client.say(target, `BibleThump ${commandName.split('scout ')[1]} hasn't played any ranked games this set FeelsBadMan BibleThump`);
                                 return
@@ -312,13 +308,12 @@ function onMessageHandler(target, context, msg, self) {
             req.end()
         } else if (commandName === '!help') {
             BOTS = 'MrDestructoid MrDestructoid MrDestructoid';
-            const msg = `${BOTS} Possible Commands: !help, !history, !ladder, !scout SUMMONERNAME, and !MMR. Any questions lmk in chat ty ${BOTS}`;
+            const msg = `${BOTS} Possible Commands: !help, !history, !ladder, !rank, !scout SUMMONERNAME, and !MMR. Any questions lmk in chat ty ${BOTS}`;
             client.say(target, msg);
-        } else if (commandName === '!ladder') {
+        } else if (commandName === '!ladder' || commandName === '!rank') {
             checkRiotAvailable(client, target);
-            ladder = 'master';
+            ladder = 'grandmaster';
             let LADDER_URL = `https://na1.api.riotgames.com/tft/league/v1/${ladder}?api_key=${API_KEY}`;
-            console.log(LADDER_URL);
             https.get(LADDER_URL, res2 => {
                 let body = '';
                 res2.on('data', function (chunk) {
