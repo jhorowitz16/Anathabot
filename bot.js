@@ -169,10 +169,24 @@ function getHistoryMessageWithPUUID(matchData, puuid) {
     });
     var match = `Last Game was a ${getPlacementString(fan.placement)}. `;
     match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}. `;
-    if (carries.includes('Malz'))
+    if (carries.includes('Lux'))
+        match += 'He ran TwitchLit ARCANISTS TwitchLit. ';
+    else if (carries.includes('Malz'))
         match += 'He ran TwitchLit MALZ REROLL TwitchLit. ';
-    if (carries.includes('Yone'))
+    else if (carries.includes('Yone'))
         match += 'He ran TwitchLit CHALLENGER YONE TwitchLit. ';
+    else if (carries.includes('Urgot'))
+        match += 'He ran TwitchLit URGOT CARRY TwitchLit. ';
+    else if (carries.includes('Kat'))
+        match += 'He ran TwitchLit katJAM TwitchLit. ';
+    else if (carries.includes('Garen') && carries.includes('Kog'))
+        match += 'He ran TwitchLit GAREN KOG TwitchLit. ';
+    else if (carries.includes('Trist') && carries.includes('Poppy'))
+        match += 'He ran TwitchLit YORDLES TwitchLit. ';
+    else if (carries.includes('Lissandra'))
+        match += 'He ran TwitchLit LISSANDRA CARRY TwitchLit. ';
+    else if (carries.includes('Garen'))
+        match += 'He ran TwitchLit REROLL GAREN TwitchLit. ';
     match += `He put 3 items on * ${carries}*${itemStr} with a final comp of ${comp}.`;
     return match;
 }
@@ -271,8 +285,6 @@ function onMessageHandler(target, context, msg, self) {
                     }
                     MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/${summonerID}?api_key=${API_KEY}`;
                     const HISTORY_URL = `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/${summonerPUUID}/ids?count=20&api_key=${API_KEY}`
-
-                    console.log(JSON.parse(d));
 
                     const urls = [MMR_URL, HISTORY_URL];
                     console.log(urls);

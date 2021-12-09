@@ -24,11 +24,6 @@ client.on('connected', onConnectedHandler);
 // Connect to Twitch:
 client.connect();
 
-hashCode = s => s.split('').reduce((a, b) => {
-    a = ((a << 5) - a) + b.charCodeAt(0);
-    return a & a
-}, 0)
-
 const seenUsers = new Set();
 
 function onMessageHandler(target, context, msg, self) {
