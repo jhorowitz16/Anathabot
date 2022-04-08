@@ -38,7 +38,7 @@ function onMessageHandler(target, context, msg, self) {
     try {
         const name = context['display-name'];
         if (!seenUsers.has(name)) {
-            client.say(target, `Welcome to the stream ${name}! Thanks for stopping by Squid3`);
+            client.say(target, `Welcome to the stream ${name}! Thanks for stopping by!`);
         }
         seenUsers.add(context['display-name']);
     } catch (error) {

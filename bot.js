@@ -10,6 +10,7 @@ PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB
 items = fs.readFileSync('items.json', 'utf8');
 ITEMS = JSON.parse(items);
 
+const CHALLENGER_COUNT = 200;
 
 try {
     API_KEY = fs.readFileSync('key.txt', 'utf8');
@@ -153,7 +154,8 @@ function getHistoryMessageWithPUUID(matchData, puuid) {
     let carries = '';
     let itemStr = '';
     fan.units.forEach(unit => {
-        name = unit.character_id.split('TFT6_')[1];
+        console.log(unit.character_id);
+        name = unit.character_id.split('_')[1];
         tier = unit.tier
         comp += name + '_' + tier + ' ';
         if (unit.items.length === 3) {
@@ -171,6 +173,10 @@ function getHistoryMessageWithPUUID(matchData, puuid) {
     match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}. `;
     if (carries.includes('Lux'))
         match += 'He ran TwitchLit ARCANISTS TwitchLit. ';
+    else if (carries.includes('Jinx') && carries.includes('Trundle'))
+        match += 'He ran TwitchLit SCRAP TwitchLit. ';
+    else if (carries.includes('Ezreal'))
+        match += 'He ran TwitchLit INNOVATORS TwitchLit. ';
     else if (carries.includes('Malz'))
         match += 'He ran TwitchLit MALZ REROLL TwitchLit. ';
     else if (carries.includes('Yone'))
@@ -191,7 +197,7 @@ function getHistoryMessageWithPUUID(matchData, puuid) {
     return match;
 }
 
-function getLadderMessage(ladderData, ladder) {
+function getLeaderboardMessage(ladderData, ladder) {
     let arr = [];
     ladderData.entries.forEach(x => {
         arr.push([parseInt(x.leaguePoints), x.summonerName]);
@@ -201,20 +207,53 @@ function getLadderMessage(ladderData, ladder) {
     });
     // fan is the number of players in this ladder below anathana
     let fan = arr.findIndex(p => p[1] == 'anathana');
+    let report = '';
+    arr.forEach(elem => report.concat(report, `${elem[1]}(${elem[0]}), `));
+    return report;
+
+}
+function getLadderMessage(ladderData, ladder) {
+    let arr = [];
+    ladderData.entries.forEach(x => {
+        arr.push([parseInt(x.leaguePoints), x.summonerName]);
+    });
+    arr.sort(function (a, b) {
+        return a[0] - b[0];
+    });
+    console.log(arr);
+    console.log(arr[arr.length - 1])
+    // fan is the number of players in this ladder below anathana
+    let fan = arr.findIndex(p => p[1] == 'anathana');
     ladderStr = ladder.charAt(0).toUpperCase() + ladder.slice(1);
     if (fan < 0)
         return `:( looks like twitch.tv/anathana isn't in the TFT ${ladderStr} (NA) ladder`;
     const fanLP = parseInt(fan.leaguePoints);
     LPs = arr.map(tup => tup[0]);
     percentile = Number((100 - (fan / arr.length * 100)).toFixed(2));
+    // LADDER_LENGTHS[2] = CHALLENGER_COUNT;
     if (fan < arr.length) {
         let report = `twitch.tv/anathana is in the top ${percentile}% of the ${arr.length} TFT ${ladderStr} Players (NA) at ${arr[fan][0]} LP. `;
-        report += `there are ${LADDER_LENGTHS[2]} challenger players`;
+        if (ladder !== 'challenger')
+            report += `there are ${LADDER_LENGTHS[2]} challenger players`;
         if (ladder === 'master')
             report += `and ${LADDER_LENGTHS[1]} GMs `;
         const base = LADDER_LENGTHS[2] + LADDER_LENGTHS[1] - fan;
-        const rank = (ladder === 'master') ? base + LADDER_LENGTHS[0] : base;
-        return `${report} above him. He's currently GivePLZ Rank #${rank} GivePLZ.`
+        let rank = base;
+        if (ladder === 'master') {
+            rank = base + LADDER_LENGTHS[0];
+            return `${report} above him. He's currently GivePLZ Rank #${rank} GivePLZ.`
+        } else if (ladder === 'challenger') {
+            rank = base - LADDER_LENGTHS[1];
+            report = `${report} He's currently GivePLZ Rank #${rank} GivePLZ. `
+            report += `Rank 1 (${arr[arr.length - 1][1]}) is ${arr[arr.length - 1][0] - arr[fan][0]} LP up. `;
+            report += `Rank 10 (${arr[arr.length - 10][1]}) is ${arr[arr.length - 10][0] - arr[fan][0]} LP up. `;
+            report += `Rank 100 (${arr[arr.length - 100][1]}) is ${arr[arr.length - 100][0] - arr[fan][0]} LP up. `;
+            return report;
+        } else {
+            rank = base;
+            report = `${report} above him. He's currently GivePLZ Rank #${rank} GivePLZ.`
+            return report
+        }
 
     } else {
         bugString();
@@ -340,13 +379,13 @@ function onMessageHandler(target, context, msg, self) {
                 console.error(error)
             })
             req.end()
-        } else if (commandName === '!help') {
+        } else if (commandName === '!help' || commandName === '!commands') {
             BOTS = 'MrDestructoid MrDestructoid MrDestructoid';
             const msg = `${BOTS} Possible Commands: !help, !history, !ladder, !rank, !scout SUMMONERNAME, and !MMR. Any questions lmk in chat ty ${BOTS}`;
             client.say(target, msg);
-        } else if (commandName === '!ladder' || commandName === '!rank') {
+        } else if (commandName === '!ladder' || commandName === '!rank' || commandName === '!leaderboard') {
             checkRiotAvailable(client, target);
-            ladder = 'grandmaster';
+            ladder = 'challenger';
             let LADDER_URL = `https://na1.api.riotgames.com/tft/league/v1/${ladder}?api_key=${API_KEY}`;
             https.get(LADDER_URL, res2 => {
                 let body = '';
@@ -355,7 +394,11 @@ function onMessageHandler(target, context, msg, self) {
                 }).on('end', function () {
                     const ladderData = JSON.parse(body);
                     console.log(ladderData.entries.length);
-                    client.say(target, getLadderMessage(ladderData, ladder));
+                    if (commandName === '!leaderboard') {
+                        client.say(target, getLeaderboardMessage(ladderData, ladder));
+                    } else {
+                        client.say(target, getLadderMessage(ladderData, ladder));
+                    }
                 });
                 res2.on('error', error => {
                     console.error(error);
