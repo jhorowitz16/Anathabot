@@ -108,7 +108,7 @@ function getPlacementString(placement) {
         case 1:
             return '1st PogChamp';
         case 2:
-            return '2th VoHiYo ';
+            return '2nd VoHiYo ';
         case 3:
             return '3rd TTours';
         case 4:
