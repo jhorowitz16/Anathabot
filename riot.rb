@@ -7,6 +7,8 @@ ANATHANA_PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1Hfls
 $key = File.open("key.txt").read
 puts $key
 
+$augment_hash = Hash.new(0)
+
 def get_recent_games(count)
   url = "https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/#{ANATHANA_PUUID}/ids?count=#{count}&api_key=#{$key}"
   res = Net::HTTP.get_response(URI(url))
@@ -26,6 +28,16 @@ def get_match_data(match_id)
   anathana_data
 end
 
+def update_augments(augments)
+  augments.each {|augment| $augment_hash[augment] += 1}
+end
+
+def fetch_and_process(match_id)
+  anathana_data = get_match_data(match_id)
+  update_augments(anathana_data["augments"])
+end
+
+
 games = get_recent_games(3)
 puts games.length
-games.each { |match_id| get_match_data(match_id) }
+games.each { |match_id| fetch_and_process(match_id) }
