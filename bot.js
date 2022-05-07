@@ -83,7 +83,9 @@ hashCode = s => s.split('').reduce((a, b) => {
 
 
 function spam(target, msg) {
-    if (msg.toLowerCase().includes("squid")) {
+    if (msg.toLowerCase().includes("cutie")) {
+        client.say(target, "GivePLZ Y O R D L E S TakeNRG");
+    } else if (msg.toLowerCase().includes("squid")) {
         client.say(target, "GivePLZ GivePLZ GivePLZ GivePLZ GivePLZ");
     } else if (msg.toLowerCase().includes("pepe")) {
         client.say(target, `OSFrog OSFrog OSFrog OSFrog OSFrog`);
@@ -97,7 +99,7 @@ function spam(target, msg) {
     } else if (msg.toLowerCase().includes("draconic")) {
         client.say(target, "SMOrc SMOrc SMOrc SMOrc SMOrc");
     } else {
-        if (hashCode(msg) % 10 > 2) {
+        if (hashCode(msg) % 10 > 8) {
             client.say(target, "Squid1 Squid2 Squid3 Squid4");
         }
     }

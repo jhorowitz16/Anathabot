@@ -38,7 +38,18 @@ function onMessageHandler(target, context, msg, self) {
     try {
         const name = context['display-name'];
         if (!seenUsers.has(name)) {
-            client.say(target, `Welcome to the stream ${name}! Thanks for stopping by!`);
+
+            if (name === 'strawbxrrie') {
+                client.say(target, `Welcome to the stream ${name}! @anathana 6 cuties?`);
+            } else if (name === 'WhiteFoxTFT') {
+                client.say(target, `Welcome to the stream ${name}! ICANT ICANT`);
+            } else if (name === 'trained_monkey') {
+                client.say(target, `Welcome to the stream ${name}! monkaS`);
+            } else if (name === 'snailman1234') {
+                client.say(target, `Welcome to the stream ${name}! Hello Mr. Snail`);
+            } else {
+                client.say(target, `Welcome to the stream ${name}! Thanks for stopping by!`);
+            }
         }
         seenUsers.add(context['display-name']);
     } catch (error) {
