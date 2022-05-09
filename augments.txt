@@ -1,0 +1,6 @@
+26 TFT_Augment_Weakspot
+19 TFT_Augment_Backfoot
+15 TFT_Augment_SecondWind
+14 TFT_Augment_CelestialBlessing
+11 TFT_Augment_JeweledLotus
+10 TFT_Augment_Phalanx

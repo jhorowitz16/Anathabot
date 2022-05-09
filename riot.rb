@@ -23,21 +23,39 @@ def get_match_data(match_id)
   res = Net::HTTP.get_response(URI(url))
   data = JSON.parse(res.body)
   partcipants = data["info"]["participants"]
-  anathana_data = partcipants.find {|p| (p["puuid"] == ANATHANA_PUUID)}
+  anathana_data = partcipants.find { |p| (p["puuid"] == ANATHANA_PUUID) }
   puts anathana_data
   anathana_data
 end
 
+def removed_digits(s)
+  s.tr('0-9', '')
+end
+
 def update_augments(augments)
-  augments.each {|augment| $augment_hash[augment] += 1}
+  augments.each { |augment| $augment_hash[removed_digits(augment)] += 1 }
 end
 
 def fetch_and_process(match_id)
-  anathana_data = get_match_data(match_id)
-  update_augments(anathana_data["augments"])
+  begin
+    anathana_data = get_match_data(match_id)
+    update_augments(anathana_data["augments"])
+  rescue
+    puts "error with #{match_id}"
+  end
 end
 
+def build_augment_insights()
+  result = $augment_hash.sort_by do |k, v|
+    -v
+  end
+  result.map { |r| "#{r[1]} #{r[0]}" }[0..4].join("\n")
+end
 
-games = get_recent_games(3)
+games = get_recent_games(100)
 puts games.length
 games.each { |match_id| fetch_and_process(match_id) }
+
+insights = build_augment_insights
+puts insights
+File.open("augments.txt", "w") { |f| f.write "#{insights}" }

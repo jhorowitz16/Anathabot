@@ -6,6 +6,7 @@ const request = require('request-promise');
 
 
 let isRiotAvailable = false;
+let AUGMENTS = '';
 PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw';
 items = fs.readFileSync('items.json', 'utf8');
 ITEMS = JSON.parse(items);
@@ -26,7 +27,7 @@ try {
         res.on('error', error => {
             isRiotAvailable = false;
         });
-
+    AUGMENTS = fs.readFileSync('augments.txt', 'utf8');
     });
 } catch (err) {
     console.error(err)
@@ -288,6 +289,9 @@ function onMessageHandler(target, context, msg, self) {
         if (commandName === '!dice') {
             client.say(target, `You rolled a ${rollDice()}`);
         } else if (commandName === '!lobby') {
+        } else if (commandName === '!augments') {
+            AUGMENTS = fs.readFileSync('augments.txt', 'utf8');
+            client.say(target, `Of the last 100 games, anathana's top 5 augments were: ${AUGMENTS}`);
         } else if (commandName === '!history') {
             checkRiotAvailable(client, target);
             const req = https.get(RECENT_GAMES, res => {
