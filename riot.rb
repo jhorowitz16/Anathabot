@@ -49,7 +49,7 @@ def build_augment_insights()
   result = $augment_hash.sort_by do |k, v|
     -v
   end
-  result.map { |r| "#{r[1]} #{r[0]}" }[0..4].join("\n")
+  result.map { |r| "#{r[0].split('_')[2]} (#{r[1]})" }[0..4].join(", ")
 end
 
 games = get_recent_games(100)
