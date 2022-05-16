@@ -40,21 +40,27 @@ function onMessageHandler(target, context, msg, self) {
         if (!seenUsers.has(name)) {
 
             if (name === 'strawbxrrie') {
-                client.say(target, `Welcome to the stream ${name}! @anathana 6 cuties?`);
+                client.say(target, `Welcome to the stream @${name}! @anathana 6 cuties?`);
             } else if (name === 'WhiteFoxTFT') {
-                client.say(target, `Welcome to the stream ${name}! ICANT ICANT`);
+                client.say(target, `Welcome to the stream @${name}! ICANT ICANT`);
             } else if (name === 'trained_monkey') {
-                client.say(target, `Welcome to the stream ${name}! monkaS`);
+                client.say(target, `Welcome to the stream @${name}! monkaS`);
             } else if (name === 'snailman1234') {
-                client.say(target, `Welcome to the stream ${name}! Hello Mr. Snail`);
+                client.say(target, `Welcome to the stream @${name}! Hello Mr. Snail`);
             } else if (name === 'MyCatStoleMyLP') {
-                client.say(target, `Welcome to the stream ${name}! u gotta greet him properly`);
+                client.say(target, `Welcome to the stream @${name}! u gotta greet him properly`);
             } else if (name === 'JustBuffer') {
-                client.say(target, `Welcome to the stream ${name}! Remember to follow him at twitch.tv/JustBuffer`);
+                client.say(target, `Welcome to the stream @${name}! Remember to follow him at twitch.tv/JustBuffer`);
+            } else if (name === 'reunicoce') {
+                client.say(target, `Welcome to the stream @${name}! Remember to follow him at twitch.tv/reunicoce`);
+            } else if (name === 'repose123') {
+                client.say(target, `Welcome to the stream @${name}! Ez game`);
+            } else if (name === 'DrownedGod') {
+                client.say(target, `Welcome to the stream @${name}! Remember to follow him at twitch.tv/DrownedGod`);
             } else if (name === 'a_stoiven') {
-                client.say(target, `Welcome to the stream ${name}! @anathana yo yo how ur games`);
+                client.say(target, `Welcome to the stream @${name}! @anathana yo yo how ur games`);
             } else {
-                client.say(target, `Welcome to the stream ${name}! Thanks for stopping by!`);
+                client.say(target, `Welcome to the stream @${name}! Thanks for stopping by!`);
             }
         }
         seenUsers.add(context['display-name']);

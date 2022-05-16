@@ -1,1 +1,1 @@
-Weakspot (19), Backfoot (17), CelestialBlessing (15), Diversify (14), SecondWind (13)
+ComponentGrabBag (4), Diversify (4), CelestialBlessing (3), Backfoot (3), RadiantRelics (3)
