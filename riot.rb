@@ -9,6 +9,9 @@ puts $key
 
 $augment_hash = Hash.new(0)
 $items_hash = Hash.new(0)
+$augment_placement_hash = Hash.new([])
+$component_count_list = []
+$round_list = []
 
 def get_recent_games(count)
   url = "https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/#{ANATHANA_PUUID}/ids?count=#{count}&api_key=#{$key}"
@@ -35,30 +38,34 @@ def removed_digits(s)
   s.tr('0-9', '')
 end
 
-def update_augments(augments)
+def update_augments(augments, placement)
   augments.each { |augment| $augment_hash[removed_digits(augment)] += 1 }
+  augments.each { |augment| $augment_placement_hash[removed_digits(augment)] +=  [placement] }
 end
 
-def update_items(units)
+def update_units(units)
+  component_count = 0
   units.each do |unit|
     items = unit["itemNames"]
-    items.each { |item| $items_hash[item] += 1}
+    items.each { |item| $items_hash[item] += 1 }
+    item_ids = unit["items"]
+    item_ids.each { |item| component_count += (item <= 9 ? 1 : 2) }
   end
-
+  $component_count_list.append(component_count)
 end
-
 
 def fetch_and_process(match_id)
   begin
     anathana_data = get_match_data(match_id)
-    update_augments(anathana_data["augments"])
-    update_items(anathana_data["units"])
+    update_augments(anathana_data["augments"], anathana_data["placement"])
+    update_units(anathana_data["units"])
+    $round_list.append(anathana_data["last_round"])
   rescue
     puts "error with #{match_id}"
   end
 end
 
-def build_insights(filepath, hash)
+def build_hash_insights(filepath, hash)
   result = hash.sort_by do |k, v|
     -v
   end
@@ -67,8 +74,36 @@ def build_insights(filepath, hash)
   File.open(filepath, "w") { |f| f.write "#{insights}" }
 end
 
-games = get_recent_games(20)
+def _compute_stats(frequency_list)
+  mean = frequency_list.sum(0.0) / frequency_list.size
+  sum = frequency_list.sum(0.0) { |element| (element - mean) ** 2 }
+  standard_deviation = Math.sqrt(sum / (frequency_list.size - 1))
+  [mean.round(2), standard_deviation.round(2)]
+end
+
+def build_component_insights(filepath, frequency_list, round_list)
+  items_per_round = frequency_list.zip(round_list).map { |tup| tup[0].to_f / tup[1] }
+  insights = "#{_compute_stats(frequency_list).join(", ")}\n#{_compute_stats(items_per_round).join(", ")}"
+  File.open(filepath, "w") { |f| f.write "#{insights}" }
+end
+
+def build_placement_insights(filepath, hash)
+  puts $augment_placement_hash
+  result = hash.sort_by do |k, v|
+    stats = _compute_stats(v)
+    mean = stats[0]
+    standard_deviation = stats[1]
+    (v.size < 5) ? 9 : mean
+  end
+  insights = result.map { |r| "#{r[0].split('_')[2]} (#{r[1]})" }.join(", ")
+  puts insights
+  File.open(filepath, "w") { |f| f.write "#{insights}" }
+end
+
+games = get_recent_games(100)
 games.each { |match_id| fetch_and_process(match_id) }
 
-build_insights("augments.txt", $augment_hash)
-build_insights("items.txt", $items_hash)
+build_hash_insights("augments.txt", $augment_hash)
+build_hash_insights("items.txt", $items_hash)
+build_component_insights("components.txt", $component_count_list, $round_list)
+build_placement_insights("placements.txt", $augment_placement_hash)
