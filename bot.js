@@ -288,10 +288,17 @@ function onMessageHandler(target, context, msg, self) {
     try {
         if (commandName === '!dice') {
             client.say(target, `You rolled a ${rollDice()}`);
-        } else if (commandName === '!lobby') {
         } else if (commandName === '!augments') {
             AUGMENTS = fs.readFileSync('augments.txt', 'utf8');
-            client.say(target, `Of the last 100 games, anathana's top 5 augments were: ${AUGMENTS}`);
+            AUGMENT = fs.readFileSync('placements.txt', 'utf8');
+            const lines = AUGMENT.split('\n').slice(0, 5).join(' PogChamp ');
+            client.say(target, `Of the last 100 games, anathana's most common 5 augments were: ${AUGMENTS}. PogChamp PogChamp PogChamp His best augments were ${lines}`);
+        } else if (commandName.includes('!augment')) {
+            AUGMENT = fs.readFileSync('placements.txt', 'utf8');
+            augment = commandName.split('augment ')[1];
+            const lines = AUGMENT.split('\n');
+            const report = (lines.find(line => line.includes(augment)));
+            client.say(target, `Of the last 100 games, anathana's had the following games with ${augment}: ${report}`);
         } else if (commandName === '!history') {
             checkRiotAvailable(client, target);
             const req = https.get(RECENT_GAMES, res => {

@@ -3,7 +3,9 @@ require 'net/http'
 require 'json'
 
 ANATHANA_ACCOUNT_ID = 'A-buldZ0gSitz6AgtD0Gso6NrspGeQ0Oylry-jSydTvb5u0'
+WHITEFOX_PUUID = 'EPd_f6AMZ728QGVU5EMOwYj2gShvkH_b37636HCto0mmS1JSIo2S9IeHgrOTVY242mVVCy2JNHFoew'
 ANATHANA_PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw'
+PUUID = ANATHANA_PUUID
 $key = File.open("key.txt").read
 puts $key
 
@@ -14,7 +16,7 @@ $component_count_list = []
 $round_list = []
 
 def get_recent_games(count)
-  url = "https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/#{ANATHANA_PUUID}/ids?count=#{count}&api_key=#{$key}"
+  url = "https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/#{PUUID}/ids?count=#{count}&api_key=#{$key}"
   res = Net::HTTP.get_response(URI(url))
   unless res.is_a?(Net::HTTPSuccess)
     puts "Refresh key at https://developer.riotgames.com/"
@@ -29,7 +31,7 @@ def get_match_data(match_id)
   res = Net::HTTP.get_response(URI(url))
   data = JSON.parse(res.body)
   partcipants = data["info"]["participants"]
-  anathana_data = partcipants.find { |p| (p["puuid"] == ANATHANA_PUUID) }
+  anathana_data = partcipants.find { |p| (p["puuid"] == PUUID) }
   puts anathana_data
   anathana_data
 end
@@ -95,7 +97,7 @@ def build_placement_insights(filepath, hash)
     standard_deviation = stats[1]
     (v.size < 5) ? 9 : mean
   end
-  insights = result.map { |r| "#{r[0].split('_')[2]} (#{r[1]})" }.join(", ")
+  insights = result.map { |r| "#{r[0].split('_')[2]} (#{r[1]}) mean/SD: #{_compute_stats(r[1]).join('/')}" }.join("\n   ")
   puts insights
   File.open(filepath, "w") { |f| f.write "#{insights}" }
 end

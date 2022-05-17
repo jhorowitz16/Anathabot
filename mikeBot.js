@@ -59,6 +59,10 @@ function onMessageHandler(target, context, msg, self) {
                 client.say(target, `Welcome to the stream @${name}! Remember to follow him at twitch.tv/DrownedGod`);
             } else if (name === 'a_stoiven') {
                 client.say(target, `Welcome to the stream @${name}! @anathana yo yo how ur games`);
+            } else if (name === 'vanillaxd') {
+                client.say(target, `Welcome to the stream @${name}! peepoHey`);
+            } else if (name === 'linsins') {
+                client.say(target, `Welcome to the stream @${name}! Remember to follow hm at twitch.tv/linsins`);
             } else {
                 client.say(target, `Welcome to the stream @${name}! Thanks for stopping by!`);
             }
