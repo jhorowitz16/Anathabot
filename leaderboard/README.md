@@ -1,24 +1,17 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Table: user name map to message count, day count 
+user name
 
-Things you may want to cover:
+Message record
+ - user name
+ - message text
+ - message date
 
-* Ruby version
+User
+ - id
+ - user name primary key
+ - unique message count
+ - unique day count 
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+$ bin/rails generate model Message username:text date:text text:text
