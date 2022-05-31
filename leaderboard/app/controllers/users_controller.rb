@@ -11,7 +11,7 @@ class UsersController < ApplicationController
     @message_count = @messages.size
 
     @json = JSON.generate({ username: @username, day_count: @day_count, message_count: @message_count })
-
+    render json: @json
   end
 
   def _count_unique_days

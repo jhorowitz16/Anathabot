@@ -1,8 +1,23 @@
 API_KEY = 'RGAPI-15c268ea-0ae8-420b-a62e-8f525f5e7a9b';
 
 const tmi = require('tmi.js');
-const https = require('https')
-
+const http = require('http');
+const HOME = "http://127.0.0.1:3000";
+const customGreetings = new Map([
+    ['strawbxrrie', '@anathana 6 cuties?'],
+    ['WhiteFoxTFT', 'ICANT ICANT'],
+    ['trained_monkey', 'monkaS'],
+    ['snailman1234', 'Remember to follow him at twitch.tv/snailman1234'],
+    ['MyCatStoleMyLP', 'u gotta greet him properly'],
+    ['JustBuffer', 'Remember to follow him at twitch.tv/JustBuffer'],
+    ['reunicoce', 'Remember to follow him at twitch.tv/reunicoce'],
+    ['repose123', 'Ez game'],
+    ['DrownedGod', 'Remember to follow him at twitch.tv/DrownedGod'],
+    ['a_stoiven', '@anathana yo yo how ur games'],
+    ['vanillaxd', '@anathana peepoHey'],
+    ['linsins', 'Remember to follow hm at twitch.tv/linsins'],
+    ['ChatPlaysLive', 'pog'],
+])
 // Define configuration options
 const opts = {
     identity: {
@@ -26,48 +41,43 @@ client.connect();
 
 const seenUsers = new Set();
 
+function reportUserMessageData(target, username, callback) {
+    console.log('fetching');
+    console.log(`${HOME}/users/${username}`);
+    http.get(`${HOME}/users/${username}`, res => {
+        res.on('data', d => {
+            client.say(target, callback(d.toString()));
+        });
+    });
+}
+
+function formatLeaderText(userDataStr) {
+    const userData = JSON.parse(userDataStr);
+    return `${userData.username} has ${userData.message_count} messages over ${userData.day_count} recent highlighted streams.`;
+}
+
 function onMessageHandler(target, context, msg, self) {
-    console.log(self);
+    console.log(msg);
+    const commandName = msg.trim();
+    const name = context['display-name'];
+    if (commandName.includes('!user')) {
+        const username = commandName.includes(' ') ? commandName.split('user ')[1] : name;
+        reportUserMessageData(target, username, x => x)
+    }
+
     if (self || context['display-name'] === 'MikeYeungP1' || context['display-name'] === 'anathaBot' || context['display-name'] === 'anathana') {
         return;
     } // Ignore messages from the bot
 
-    const commandName = msg.trim();
     console.log(commandName);
     console.log(context);
-    try {
-        const name = context['display-name'];
-        if (!seenUsers.has(name)) {
 
-            if (name === 'strawbxrrie') {
-                client.say(target, `Welcome to the stream @${name}! @anathana 6 cuties?`);
-            } else if (name === 'WhiteFoxTFT') {
-                client.say(target, `Welcome to the stream @${name}! ICANT ICANT`);
-            } else if (name === 'trained_monkey') {
-                client.say(target, `Welcome to the stream @${name}! monkaS`);
-            } else if (name === 'snailman1234') {
-                client.say(target, `Welcome to the stream @${name}! Hello Mr. Snail`);
-            } else if (name === 'MyCatStoleMyLP') {
-                client.say(target, `Welcome to the stream @${name}! u gotta greet him properly`);
-            } else if (name === 'JustBuffer') {
-                client.say(target, `Welcome to the stream @${name}! Remember to follow him at twitch.tv/JustBuffer`);
-            } else if (name === 'reunicoce') {
-                client.say(target, `Welcome to the stream @${name}! Remember to follow him at twitch.tv/reunicoce`);
-            } else if (name === 'repose123') {
-                client.say(target, `Welcome to the stream @${name}! Ez game`);
-            } else if (name === 'DrownedGod') {
-                client.say(target, `Welcome to the stream @${name}! Remember to follow him at twitch.tv/DrownedGod`);
-            } else if (name === 'a_stoiven') {
-                client.say(target, `Welcome to the stream @${name}! @anathana yo yo how ur games`);
-            } else if (name === 'vanillaxd') {
-                client.say(target, `Welcome to the stream @${name}! peepoHey`);
-            } else if (name === 'linsins') {
-                client.say(target, `Welcome to the stream @${name}! Remember to follow hm at twitch.tv/linsins`);
-            } else {
-                client.say(target, `Welcome to the stream @${name}! Thanks for stopping by!`);
-            }
+    try {
+        if (!seenUsers.has(name)) {
+            const greeting = customGreetings.get(name) || 'Thanks for stopping by.'
+            reportUserMessageData(target, name, x => `Welcome to the stream @${name}! ${greeting} ${formatLeaderText(x)}`)
+            seenUsers.add(context['display-name']);
         }
-        seenUsers.add(context['display-name']);
     } catch (error) {
         console.log(error);
     }
