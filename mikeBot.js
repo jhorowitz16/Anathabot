@@ -53,13 +53,25 @@ function reportUserMessageData(target, username, callback) {
 
 function formatLeaderText(userDataStr) {
     const userData = JSON.parse(userDataStr);
-    return `${userData.username} has ${userData.message_count} messages over ${userData.day_count} recent highlighted streams.`;
+    if (userData.message_count) {
+        return `GivePLZ You have ${userData.message_count} messages over ${userData.day_count} recent highlighted stream${userData.day_count !== 1 ? 's' : ''}.`;
+    } else {
+        return `GivePLZ !user for more info :)`;
+    }
 }
 
 function onMessageHandler(target, context, msg, self) {
+
+    if (self || context['display-name'] === 'MikeYeungP1' || context['display-name'] === 'anathaBot' || context['display-name'] === 'anathana') {
+        return;
+    } // Ignore messages from the bot
+
     console.log(msg);
     const commandName = msg.trim();
     const name = context['display-name'];
+    const date = new Date();
+    const dateStr = `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()}`
+    console.log(dateStr);
     if (commandName.includes('!user')) {
         const username = commandName.includes(' ') ? commandName.split('user ')[1] : name;
         reportUserMessageData(target, username, x => x)
@@ -75,12 +87,13 @@ function onMessageHandler(target, context, msg, self) {
     try {
         if (!seenUsers.has(name)) {
             const greeting = customGreetings.get(name) || 'Thanks for stopping by.'
-            reportUserMessageData(target, name, x => `Welcome to the stream @${name}! ${greeting} ${formatLeaderText(x)}`)
+            reportUserMessageData(target, name, x => `Welcome to the stream ${name}! ${greeting} ${formatLeaderText(x)}`)
             seenUsers.add(context['display-name']);
         }
     } catch (error) {
         console.log(error);
     }
+    http.get(`${HOME}/users/new?username=${name}&date=${dateStr}`);
 }
 
 

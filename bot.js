@@ -10,7 +10,8 @@ let AUGMENTS = '';
 PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw';
 items = fs.readFileSync('items.json', 'utf8');
 ITEMS = JSON.parse(items);
-
+BOTS = 'MrDestructoid MrDestructoid MrDestructoid';
+HELP_MSG = `${BOTS} Possible Commands: !help, !user, !user TWITCHNAME, !history, !ladder, !rank, !scout SUMMONERNAME, and !MMR. Any questions lmk in chat ty ${BOTS}`;
 const CHALLENGER_COUNT = 200;
 
 try {
@@ -27,7 +28,7 @@ try {
         res.on('error', error => {
             isRiotAvailable = false;
         });
-    AUGMENTS = fs.readFileSync('augments.txt', 'utf8');
+        AUGMENTS = fs.readFileSync('augments.txt', 'utf8');
     });
 } catch (err) {
     console.error(err)
@@ -101,7 +102,7 @@ function spam(target, msg) {
         client.say(target, "SMOrc SMOrc SMOrc SMOrc SMOrc");
     } else {
         if (hashCode(msg) % 10 > 8) {
-            client.say(target, "Squid1 Squid2 Squid3 Squid4");
+            client.say(target, `Squid1 Squid2 Squid3 Squid4`);
         }
     }
 }
@@ -200,6 +201,30 @@ function getHistoryMessageWithPUUID(matchData, puuid) {
     return match;
 }
 
+function getLeagueUserData(client, target) {
+    const LEAGUE_URL = `https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/g5gaMJ2p2a6CrirWqjdF1dsnqKyh0Se_R5Gc8GWiGc_Npms?api_key=${API_KEY}`;
+    const MASTERY_URL = `https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/g5gaMJ2p2a6CrirWqjdF1dsnqKyh0Se_R5Gc8GWiGc_Npms?api_key=${API_KEY}`;
+
+    const promises = [LEAGUE_URL, MASTERY_URL].map(url => request(url));
+    Promise.all(promises).then((data) => {
+        console.log(data);
+        const league_user_data = JSON.parse(data[0])[0];
+        const mastery_user_data = JSON.parse(data[1]);
+        console.log(mastery_user_data);
+        const freqBins = new Map();
+        mastery_user_data.forEach(champ => {
+            freqBins.set(champ.championLevel, (1 + freqBins.get(champ.championLevel)) || 1);
+        });
+        console.log(mastery_user_data);
+        console.log(freqBins);
+
+        const currentRank = `anathana is ${league_user_data.tier} ${league_user_data.rank} ${league_user_data.leaguePoints}LP`;
+        const games = ` with ${league_user_data.wins} wins and ${league_user_data.losses} losses this season.`;
+        const mastery = ` He has mastery 5 on ${freqBins.get(5)} champions, and mastery 4 on ${freqBins.get(4) || 0} champions.`;
+        client.say(target, currentRank + games + mastery);
+    });
+}
+
 function getLeaderboardMessage(ladderData, ladder) {
     let arr = [];
     ladderData.entries.forEach(x => {
@@ -215,6 +240,7 @@ function getLeaderboardMessage(ladderData, ladder) {
     return report;
 
 }
+
 function getLadderMessage(ladderData, ladder) {
     let arr = [];
     ladderData.entries.forEach(x => {
@@ -288,6 +314,8 @@ function onMessageHandler(target, context, msg, self) {
     try {
         if (commandName === '!dice') {
             client.say(target, `You rolled a ${rollDice()}`);
+        } else if (commandName === '!league') {
+            getLeagueUserData(client, target);
         } else if (commandName === '!augments') {
             AUGMENTS = fs.readFileSync('augments.txt', 'utf8');
             AUGMENT = fs.readFileSync('placements.txt', 'utf8');
