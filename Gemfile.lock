@@ -1,12 +1,10 @@
 GEM
   specs:
-    twitch-chat (0.0.1)
 
 PLATFORMS
-  ruby
+  arm64-darwin-21
 
 DEPENDENCIES
-  twitch-chat
 
 BUNDLED WITH
-   1.17.2
+   2.2.3

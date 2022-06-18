@@ -1,80 +1,69 @@
-HighFive ([3, 1, 2, 1, 1]) mean/SD: 1.6/0.89
-   HeroEmblem ([1, 2, 1, 7, 3]) mean/SD: 2.8/2.49
-   Electrocharge ([3, 3, 1, 1, 2, 6, 3, 4]) mean/SD: 2.88/1.64
-   CyberneticShell ([1, 1, 4, 5, 3, 5]) mean/SD: 3.17/1.83
-   TriForce ([3, 7, 6, 2, 1, 3, 1]) mean/SD: 3.29/2.36
-   EnchanterTrait ([6, 1, 7, 6, 1, 1, 2]) mean/SD: 3.43/2.76
-   Archangel ([5, 3, 1, 1, 8]) mean/SD: 3.6/2.97
-   PortableForge ([3, 5, 4, 1, 2, 3, 2, 3, 8, 1, 5, 7]) mean/SD: 3.67/2.23
-   Weakspot ([3, 1, 6, 3, 5, 4, 8, 4, 4, 2, 1]) mean/SD: 3.73/2.1
-   ThrillOfTheHunt ([6, 1, 5, 4, 3]) mean/SD: 3.8/1.92
-   ComponentGrabBag ([3, 4, 3, 3, 6, 4]) mean/SD: 3.83/1.17
-   CelestialBlessing ([7, 7, 5, 2, 5, 2, 1, 7, 7, 1, 1, 4, 3]) mean/SD: 4.0/2.48
-   Diversify ([8, 1, 6, 1, 3, 2, 6, 6, 6, 4, 5, 7, 1, 7, 8, 1, 2, 4, 1]) mean/SD: 4.16/2.59
-   Backfoot ([8, 3, 6, 3, 3, 5, 2, 2, 7, 3, 4, 7, 7, 4, 2, 4, 4, 3]) mean/SD: 4.28/1.93
-   TomeOfTraits ([6, 3, 3, 3, 7, 5, 7]) mean/SD: 4.86/1.86
-   CyberneticUplink ([6, 3, 8, 1, 6, 6, 8, 2]) mean/SD: 5.0/2.67
-   SecondWind ([5, 7, 8, 2, 5, 4]) mean/SD: 5.17/2.14
-   BlueBattery ([7, 8, 4, 7, 3]) mean/SD: 5.8/2.17
-   LudensEcho ([1, 1, 1, 8]) mean/SD: 2.75/3.5
-   TrueTwos ([6]) mean/SD: 6.0/NaN
-   Phalanx ([3, 1, 1, 7]) mean/SD: 3.0/2.83
-   HeroTrait ([1]) mean/SD: 1.0/NaN
-   MaxLevel ([2]) mean/SD: 2.0/NaN
-   EnchanterArdentCenser ([8, 4, 7]) mean/SD: 6.33/2.08
-   DebonairEmblem ([8, 4]) mean/SD: 6.0/2.83
-   EnforcerTrait ([1]) mean/SD: 1.0/NaN
-   MeleeStarBlade ([3, 6, 3]) mean/SD: 4.0/1.73
-   ScrapTrait ([3, 4, 7]) mean/SD: 4.67/2.08
-   Keepers ([3, 2, 7, 5]) mean/SD: 4.25/2.22
-   JeweledLotus ([3, 8, 6]) mean/SD: 5.67/2.52
-   AssassinEmblem ([7]) mean/SD: 7.0/NaN
-   StrikerTrait ([7]) mean/SD: 7.0/NaN
-   MetabolicAccelerator ([3, 4]) mean/SD: 3.5/0.71
-   Underdogs ([3, 1, 4, 6]) mean/SD: 3.5/2.08
-   SalvageBin ([5, 8]) mean/SD: 6.5/2.12
-   SunfireBoard ([4, 4, 1]) mean/SD: 3.0/1.73
-   BrawlerHPRegen ([3, 5]) mean/SD: 4.0/1.41
-   ScrapDumpsterDiving ([5]) mean/SD: 5.0/NaN
-   TinyTitans ([1, 2]) mean/SD: 1.5/0.71
-   SlowAndSteady ([6]) mean/SD: 6.0/NaN
-   Meditation ([2, 5, 5, 8]) mean/SD: 5.0/2.45
-   ClockworkTrait ([6]) mean/SD: 6.0/NaN
-   BruteEmblem ([6]) mean/SD: 6.0/NaN
-   TreasureTrove ([3, 4, 2]) mean/SD: 3.0/1.0
-   RadiantRelics ([3, 1, 2]) mean/SD: 2.0/1.0
-   Ascension ([2]) mean/SD: 2.0/NaN
-   SocialiteShare ([3]) mean/SD: 3.0/NaN
-   SocialiteTrait ([3]) mean/SD: 3.0/NaN
-   FirstAidKit ([7, 6]) mean/SD: 6.5/0.71
-   ArcanistEmblem ([2, 5, 5]) mean/SD: 4.0/1.73
-   ThriftShop ([6]) mean/SD: 6.0/NaN
-   SocialiteDuet ([6]) mean/SD: 6.0/NaN
-   HextechStoredPower ([8]) mean/SD: 8.0/NaN
-   HextechHexnova ([8, 4]) mean/SD: 6.0/2.83
-   HeroStandBehindMe ([7, 6, 8]) mean/SD: 7.0/1.0
-   TradeSector ([7]) mean/SD: 7.0/NaN
-   FuturePeepers ([7]) mean/SD: 7.0/NaN
-   ChallengerEmblem ([6]) mean/SD: 6.0/NaN
-   ScrapEmblem ([4]) mean/SD: 4.0/NaN
-   DebonairIrresistible ([2]) mean/SD: 2.0/NaN
-   Disintegrator ([5, 1]) mean/SD: 3.0/2.83
-   TargetDummies ([8]) mean/SD: 8.0/NaN
-   MakeshiftArmor ([4, 2]) mean/SD: 3.0/1.41
-   SniperTrait ([8]) mean/SD: 8.0/NaN
-   CyberneticImplants ([1, 5]) mean/SD: 3.0/2.83
-   BinaryAirdrop ([3, 3, 6, 5]) mean/SD: 4.25/1.5
-   PandorasItems ([1, 4, 7]) mean/SD: 4.0/3.0
-   Battlemage ([6, 7, 1, 5]) mean/SD: 4.75/2.63
-   ArcanistRunicShield ([6]) mean/SD: 6.0/NaN
-   ThievingRascals ([8, 6, 6, 7]) mean/SD: 6.75/0.96
-   ForceOfNature ([3, 5, 8]) mean/SD: 5.33/2.52
-   SniperEmblem ([3, 5, 1, 2]) mean/SD: 2.75/1.71
-   TheGoldenEgg ([3, 1]) mean/SD: 2.0/1.41
-   Traitless ([3]) mean/SD: 3.0/NaN
-   Twins ([5, 8, 5, 4]) mean/SD: 5.5/1.73
-   ItemGrabBag ([3, 4, 6, 7]) mean/SD: 5.0/1.83
-   BruteTrait ([1, 4]) mean/SD: 2.5/2.12
-   RichGetRicher ([7, 6, 3, 6]) mean/SD: 5.5/1.73
-   MercenaryEmblem ([8, 2, 2, 8]) mean/SD: 5.0/3.46
-   StrikerEmblem ([8]) mean/SD: 8.0/NaN
+BestFriends ([2, 2, 2, 2, 3, 1, 3, 3, 3, 5, 5, 7, 5, 2, 4, 1, 2, 1]) mean: 2.94
+   DragonHorde ([6, 3, 1, 5, 1]) mean: 3.2
+   TriForce ([3, 4, 4, 4, 1, 4]) mean: 3.33
+   CyberneticImplants ([5, 2, 8, 1, 1]) mean: 3.4
+   SecondWind ([4, 3, 2, 6, 3, 2, 4, 5, 4, 1, 4, 6, 4, 5, 1, 1]) mean: 3.44
+   UrfsGrabBag ([2, 2, 1, 6, 3, 7]) mean: 3.5
+   Weakspot ([1, 1, 8, 5, 2, 4]) mean: 3.5
+   Electrocharge ([8, 1, 2, 6, 2, 3, 2, 4, 7, 2, 2]) mean: 3.55
+   PortableForge ([6, 2, 5, 4, 2]) mean: 3.8
+   Ascension ([3, 2, 3, 8, 3, 2, 7]) mean: 4.0
+   CelestialBlessing ([3, 8, 4, 6, 6, 1, 1, 4, 5, 3, 8, 2, 4, 1]) mean: 4.0
+   SunfireBoard ([2, 7, 3, 8, 4]) mean: 4.8
+   ItemGrabBag ([6, 8]) mean: 7.0
+   ScalescornTrait ([7]) mean: 7.0
+   BandOfThieves ([7, 1, 4]) mean: 4.0
+   ShapeshifterBeastsDen ([5]) mean: 5.0
+   SalvageBin ([1, 2, 4]) mean: 2.33
+   BigFriend ([3]) mean: 3.0
+   DragonAlliance ([2, 1, 3]) mean: 2.0
+   LudensEcho ([2, 5, 5]) mean: 4.0
+   ComponentGrabBag ([4, 8, 5, 3]) mean: 5.0
+   TempestEyeOfTheStorm ([5]) mean: 5.0
+   MikaelsGift ([8]) mean: 8.0
+   DragonmancerEmblem ([8]) mean: 8.0
+   MirageHallucinate ([2, 2, 1]) mean: 1.67
+   MetabolicAccelerator ([7]) mean: 7.0
+   MageEmblem ([7]) mean: 7.0
+   DragonmancerInspire ([4, 5]) mean: 4.5
+   Featherweights ([4, 1]) mean: 2.5
+   RagewingTantrum ([4, 2]) mean: 3.0
+   ThrillOfTheHunt ([2, 2]) mean: 2.0
+   BruiserTitanicStrength ([5]) mean: 5.0
+   BruiserTrait ([5]) mean: 5.0
+   TomeOfTraits ([3, 5, 4]) mean: 4.0
+   RagewingEmblem ([2]) mean: 2.0
+   SwiftshotPressTheAttack ([3, 2, 1]) mean: 2.0
+   FirstAidKit ([5, 4, 2]) mean: 3.67
+   CalculatedLoss ([4, 6]) mean: 5.0
+   SwiftshotEmblem ([8, 1]) mean: 4.5
+   GuildLoot ([1]) mean: 1.0
+   GrandGambler ([1, 7]) mean: 4.0
+   ForceOfNature ([8]) mean: 8.0
+   RagewingScorch ([8]) mean: 8.0
+   GuardianEmblem ([5]) mean: 5.0
+   Preparation ([5, 1]) mean: 3.0
+   RadiantRelics ([2, 5, 2]) mean: 3.0
+   CyberneticUplink ([5, 5, 1]) mean: 3.67
+   MageTrait ([5]) mean: 5.0
+   GuildGearUpgrades ([5]) mean: 5.0
+   CavalierEmblem ([1]) mean: 1.0
+   BruiserEmblem ([2, 1]) mean: 1.5
+   WarriorEmblem ([1]) mean: 1.0
+   VerdantVeil ([1]) mean: 1.0
+   ShimmerscaleTrait ([2]) mean: 2.0
+   LastStand ([2]) mean: 2.0
+   WarriorTiamat ([2]) mean: 2.0
+   MakeshiftArmor ([7]) mean: 7.0
+   EvokerEssenceTheft ([1]) mean: 1.0
+   Meditation ([6, 6]) mean: 6.0
+   JeweledLotus ([6, 5, 7, 3]) mean: 5.25
+   CyberneticShell ([6, 1]) mean: 3.5
+   Twins ([6]) mean: 6.0
+   BlueBattery ([6, 5, 2]) mean: 4.33
+   ScalescornEmblem ([3, 4]) mean: 3.5
+   ClutteredMind ([8]) mean: 8.0
+   ShimmerscaleEmblem ([4]) mean: 4.0
+   Diversify ([4, 3, 2, 1]) mean: 2.5
+   GuildEmblem ([6, 5]) mean: 5.5
+   BinaryAirdrop ([6, 4]) mean: 5.0

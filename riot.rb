@@ -1,10 +1,14 @@
 require 'uri'
 require 'net/http'
 require 'json'
+GAME_COUNT = 69
 
+MIN_REQUIRED_SIZE_TO_SCORE = 5
 ANATHANA_ACCOUNT_ID = 'A-buldZ0gSitz6AgtD0Gso6NrspGeQ0Oylry-jSydTvb5u0'
 WHITEFOX_PUUID = 'EPd_f6AMZ728QGVU5EMOwYj2gShvkH_b37636HCto0mmS1JSIo2S9IeHgrOTVY242mVVCy2JNHFoew'
 ANATHANA_PUUID = 'BpOSYHAsoed8SA3fOZU4Zv8M6duicGkcaX9gv8oCl4zFRXVFRjGnkrXVa1HflspFi3NKOhB1g8pDgw'
+VANILLAXD_PUUID = '2g8nI_5dfNrMOAe68UQMSBKVdU3VdtTR2QNwQXqCWTIA-dkYXj2DcBR-PzQnQpGBxODAjgpeN--3VA'
+SAPPHERICAL_PUUID = 'KrZNxB90-zGOmYDtu3TWVu1rJqIxrpjj3dHQdujb_c98kP3fRHtE6Eyp-XrtnEh4MIxF-CTuglcUCA'
 PUUID = ANATHANA_PUUID
 $key = File.open("key.txt").read
 puts $key
@@ -42,7 +46,7 @@ end
 
 def update_augments(augments, placement)
   augments.each { |augment| $augment_hash[removed_digits(augment)] += 1 }
-  augments.each { |augment| $augment_placement_hash[removed_digits(augment)] +=  [placement] }
+  augments.each { |augment| $augment_placement_hash[removed_digits(augment)] += [placement] }
 end
 
 def update_units(units)
@@ -73,14 +77,14 @@ def build_hash_insights(filepath, hash)
   end
   insights = result.map { |r| "#{r[0].split('_')[2]} (#{r[1]})" }[0..4].join(", ")
   puts insights
-  File.open(filepath, "w") { |f| f.write "#{insights}" }
+  File.open(filepath, "w") { |f| f.write "#{GAME_COUNT}\n#{insights}" }
 end
 
 def _compute_stats(frequency_list)
   mean = frequency_list.sum(0.0) / frequency_list.size
   sum = frequency_list.sum(0.0) { |element| (element - mean) ** 2 }
-  standard_deviation = Math.sqrt(sum / (frequency_list.size - 1))
-  [mean.round(2), standard_deviation.round(2)]
+  # standard_deviation = Math.sqrt(sum / (frequency_list.size - 1))
+  [mean.round(2)]
 end
 
 def build_component_insights(filepath, frequency_list, round_list)
@@ -95,14 +99,14 @@ def build_placement_insights(filepath, hash)
     stats = _compute_stats(v)
     mean = stats[0]
     standard_deviation = stats[1]
-    (v.size < 5) ? 9 : mean
+    (v.size < MIN_REQUIRED_SIZE_TO_SCORE) ? 9 : mean
   end
-  insights = result.map { |r| "#{r[0].split('_')[2]} (#{r[1]}) mean/SD: #{_compute_stats(r[1]).join('/')}" }.join("\n   ")
+  insights = result.map { |r| "#{r[0].split('_')[2]} (#{r[1]}) mean: #{_compute_stats(r[1]).join('/')}" }.join("\n   ")
   puts insights
   File.open(filepath, "w") { |f| f.write "#{insights}" }
 end
 
-games = get_recent_games(100)
+games = get_recent_games(GAME_COUNT)
 games.each { |match_id| fetch_and_process(match_id) }
 
 build_hash_insights("augments.txt", $augment_hash)

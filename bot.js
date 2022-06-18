@@ -175,28 +175,28 @@ function getHistoryMessageWithPUUID(matchData, puuid) {
     });
     var match = `Last Game was a ${getPlacementString(fan.placement)}. `;
     match += `He dealt ${fan.total_damage_to_players} damage to players that game ${getDamageString(fan.total_damage_to_players)}. `;
-    if (carries.includes('Lux'))
-        match += 'He ran TwitchLit ARCANISTS TwitchLit. ';
-    else if (carries.includes('Jinx') && carries.includes('Trundle'))
-        match += 'He ran TwitchLit SCRAP TwitchLit. ';
-    else if (carries.includes('Ezreal'))
-        match += 'He ran TwitchLit INNOVATORS TwitchLit. ';
-    else if (carries.includes('Malz'))
-        match += 'He ran TwitchLit MALZ REROLL TwitchLit. ';
-    else if (carries.includes('Yone'))
-        match += 'He ran TwitchLit CHALLENGER YONE TwitchLit. ';
-    else if (carries.includes('Urgot'))
-        match += 'He ran TwitchLit URGOT CARRY TwitchLit. ';
-    else if (carries.includes('Kat'))
-        match += 'He ran TwitchLit katJAM TwitchLit. ';
-    else if (carries.includes('Garen') && carries.includes('Kog'))
-        match += 'He ran TwitchLit GAREN KOG TwitchLit. ';
-    else if (carries.includes('Trist') && carries.includes('Poppy'))
-        match += 'He ran TwitchLit YORDLES TwitchLit. ';
-    else if (carries.includes('Lissandra'))
-        match += 'He ran TwitchLit LISSANDRA CARRY TwitchLit. ';
-    else if (carries.includes('Garen'))
-        match += 'He ran TwitchLit REROLL GAREN TwitchLit. ';
+    // if (carries.includes('Lux'))
+    //     match += 'He ran TwitchLit ARCANISTS TwitchLit. ';
+    // else if (carries.includes('Jinx') && carries.includes('Trundle'))
+    //     match += 'He ran TwitchLit SCRAP TwitchLit. ';
+    // else if (carries.includes('Ezreal'))
+    //     match += 'He ran TwitchLit INNOVATORS TwitchLit. ';
+    // else if (carries.includes('Malz'))
+    //     match += 'He ran TwitchLit MALZ REROLL TwitchLit. ';
+    // else if (carries.includes('Yone'))
+    //     match += 'He ran TwitchLit CHALLENGER YONE TwitchLit. ';
+    // else if (carries.includes('Urgot'))
+    //     match += 'He ran TwitchLit URGOT CARRY TwitchLit. ';
+    // else if (carries.includes('Kat'))
+    //     match += 'He ran TwitchLit katJAM TwitchLit. ';
+    // else if (carries.includes('Garen') && carries.includes('Kog'))
+    //     match += 'He ran TwitchLit GAREN KOG TwitchLit. ';
+    // else if (carries.includes('Trist') && carries.includes('Poppy'))
+    //     match += 'He ran TwitchLit YORDLES TwitchLit. ';
+    // else if (carries.includes('Lissandra'))
+    //     match += 'He ran TwitchLit LISSANDRA CARRY TwitchLit. ';
+    // else if (carries.includes('Garen'))
+    //     match += 'He ran TwitchLit REROLL GAREN TwitchLit. ';
     match += `He put 3 items on * ${carries}*${itemStr} with a final comp of ${comp}.`;
     return match;
 }
@@ -266,7 +266,11 @@ function getLadderMessage(ladderData, ladder) {
             report += `there are ${LADDER_LENGTHS[2]} challenger players`;
         if (ladder === 'master')
             report += `and ${LADDER_LENGTHS[1]} GMs `;
-        const base = LADDER_LENGTHS[2] + LADDER_LENGTHS[1] - fan;
+        if (ladder === 'diamond')
+            report += `and ${LADDER_LENGTHS[0]} masters`;
+        let base = LADDER_LENGTHS[2] + LADDER_LENGTHS[1] - fan;
+        if (ladder === 'diamond')
+            base += LADDER_LENGTHS[0]
         let rank = base;
         if (ladder === 'master') {
             rank = base + LADDER_LENGTHS[0];
@@ -320,7 +324,10 @@ function onMessageHandler(target, context, msg, self) {
             AUGMENTS = fs.readFileSync('augments.txt', 'utf8');
             AUGMENT = fs.readFileSync('placements.txt', 'utf8');
             const lines = AUGMENT.split('\n').slice(0, 5).join(' PogChamp ');
-            client.say(target, `Of the last 100 games, anathana's most common 5 augments were: ${AUGMENTS}. PogChamp PogChamp PogChamp His best augments were ${lines}`);
+            console.log(AUGMENT);
+            console.log(AUGMENT.split('\n'));
+            const augmentCount = AUGMENTS.split('\n')[0];
+            client.say(target, `Of the last ${augmentCount} games, anathana's most common 5 augments were: ${AUGMENTS.split('\n')[1]}. PogChamp PogChamp PogChamp His best augments were ${lines}`);
         } else if (commandName.includes('!augment')) {
             AUGMENT = fs.readFileSync('placements.txt', 'utf8');
             augment = commandName.split('augment ')[1];
@@ -350,10 +357,12 @@ function onMessageHandler(target, context, msg, self) {
                 });
             });
             req.end()
-        } else if (commandName.includes('!scout')) {
+        } else if (commandName.includes('!scout') || commandName.includes('!oce-scout') || commandName.includes('!ocescout') || commandName.includes('!nascout')) {
+            const region = (commandName.includes('oce')) ? 'oc1': 'na1';
             checkRiotAvailable(client, target);
             enemy = commandName.split('scout ')[1].replace(' ', '%20');
-            URL = `https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/${enemy}?api_key=${API_KEY}`;
+            URL = `https://${region}.api.riotgames.com/tft/summoner/v1/summoners/by-name/${enemy}?api_key=${API_KEY}`;
+            console.log(URL);
             const req = https.get(URL, res => {
                 res.on('data', d => {
                     const parsed = JSON.parse(d);
@@ -363,7 +372,7 @@ function onMessageHandler(target, context, msg, self) {
                         client.say(target, bugString());
                         return;
                     }
-                    MMR_URL = `https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/${summonerID}?api_key=${API_KEY}`;
+                    MMR_URL = `https://${region}.api.riotgames.com/tft/league/v1/entries/by-summoner/${summonerID}?api_key=${API_KEY}`;
                     const HISTORY_URL = `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/${summonerPUUID}/ids?count=20&api_key=${API_KEY}`
 
                     const urls = [MMR_URL, HISTORY_URL];
@@ -378,7 +387,7 @@ function onMessageHandler(target, context, msg, self) {
                         }
                         summoner = `${mmrData.summonerName} is currently ${mmrData.tier} ${mmrData.rank} ${mmrData.leaguePoints} LP.\n\n`;
                         winrate = Number((mmrData.wins / (mmrData.wins + mmrData.losses) * 100).toFixed(1));
-                        summoner += `This set they have gotten first ${mmrData.wins} out of ${mmrData.wins + mmrData.losses} games (${winrate}%). `;
+                        summoner += `This set they have gotten top four ${mmrData.wins} out of ${mmrData.wins + mmrData.losses} games (${winrate}%). `;
 
                         const mostRecent = JSON.parse(data[1].toString())[0];
                         MATCH_DATA = `https://americas.api.riotgames.com/tft/match/v1/matches/${mostRecent}?api_key=${API_KEY}`;
@@ -410,7 +419,7 @@ function onMessageHandler(target, context, msg, self) {
                     summoner = `${fan.summonerName} is currently ${fan.tier} ${fan.rank} ${fan.leaguePoints} LP.\n\n`;
                     summoner += 'GivePLZ GivePLZ GivePLZ ';
                     winrate = Number((fan.wins / (fan.wins + fan.losses) * 100).toFixed(1));
-                    summoner += `This set he has gotten first ${fan.wins} out of ${fan.wins + fan.losses} games (${winrate}%). `;
+                    summoner += `This set he has gotten top four ${fan.wins} out of ${fan.wins + fan.losses} games (${winrate}%). `;
                     summoner += 'GivePLZ GivePLZ GivePLZ ';
                     summoner += 'Follow his climb at https://lolchess.gg/profile/na/anathana :D';
                     client.say(target, summoner);
@@ -426,7 +435,7 @@ function onMessageHandler(target, context, msg, self) {
             client.say(target, msg);
         } else if (commandName === '!ladder' || commandName === '!rank' || commandName === '!leaderboard') {
             checkRiotAvailable(client, target);
-            ladder = 'challenger';
+            ladder = 'diamond';
             let LADDER_URL = `https://na1.api.riotgames.com/tft/league/v1/${ladder}?api_key=${API_KEY}`;
             https.get(LADDER_URL, res2 => {
                 let body = '';

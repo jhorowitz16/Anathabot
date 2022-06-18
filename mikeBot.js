@@ -46,6 +46,7 @@ function reportUserMessageData(target, username, callback) {
     console.log(`${HOME}/users/${username}`);
     http.get(`${HOME}/users/${username}`, res => {
         res.on('data', d => {
+            console.log(d.toString())
             client.say(target, callback(d.toString()));
         });
     });
